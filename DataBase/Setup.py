@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def DataBase_Connection():
-    return mysql.connector.connect(host=os.environ["Database_Host"],user=os.environ["Database_User"],password=os.environ["Database_Password"],database=os.environ["s111954_Synto"])
+    return mysql.connector.connect(host=os.environ["DATABASE_HOST"],user=os.environ["DATABASE_USER"],password=os.environ["DATABASE_PASSWORD"],database=os.environ["DATABASE_NAME"])
 
 def Add_Auto_Vc_Table():
     Connection=DataBase_Connection()
