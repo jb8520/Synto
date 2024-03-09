@@ -178,7 +178,7 @@ class Auto_Vc(commands.Cog):
                         break
                 if Number==0:
                     Number=len(self.Auto_Vcs[member.guild.id])+1
-            Channel=await member.guild.create_voice_channel(f"VC {Number}",category=self.bot.get_channel(Query(member.guild.id,"vc_Category_id")),overwrites=overwrites)
+            Channel=await member.guild.create_voice_channel(f"VC {Number}",category=self.bot.get_channel(Query(member.guild.id,"vc_category_id")),overwrites=overwrites)
             await member.move_to(Channel)
             if member.guild.id in self.Auto_Vcs:
                 self.Auto_Vcs[member.guild.id].append(Channel.id)
