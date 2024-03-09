@@ -48,14 +48,14 @@ bot=MyBot()
 
 @bot.command()
 async def servers_command(ctx):
-    if ctx.author.id==os.environ["BOT_OWNER_ID"]:
+    if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         print(f"Server Count: {len(bot.guilds)}")
         for Server in bot.guilds:
             print(Server)
 @bot.command()
 async def sync(ctx):
-    if ctx.author.id==os.environ["BOT_OWNER_ID"]:
+    if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         await bot.tree.sync()
         print("Synced Commands to the Tree")
