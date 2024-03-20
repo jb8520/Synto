@@ -6,6 +6,7 @@ from Configuration.Counting import Counting_Menu_View
 from DataBase.Counting import Configure as Counting_Configure, Query as Counting_Query
 from Configuration.Auto_Vc import Auto_Vcs_Menu_View
 from DataBase.Auto_Vc import Configure as Auto_Vc_Configure, Query as Auto_Vc_Query
+from Configuration.Economy import Economy_Settings_Menu_View
 
 class Select_Menu_View(discord.ui.View):
     def __init__(self):
@@ -16,7 +17,8 @@ class Select_Menu(discord.ui.Select):
         Options=[
             discord.SelectOption(label="Menu",description=""),
             discord.SelectOption(label="Counting",description=""),
-            discord.SelectOption(label="Auto Vcs",description="")
+            discord.SelectOption(label="Auto Vcs",description=""),
+            discord.SelectOption(label="Economy",description="")
         ]
         super().__init__(placeholder="Configuration Options",min_values=1,max_values=1,options=Options,custom_id="select_menu")
     async def callback(self,interaction:discord.Interaction):
@@ -66,6 +68,15 @@ class Select_Menu(discord.ui.Select):
                     Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(Member_Role_id).mention}",inline=False)
                 View=Auto_Vcs_Menu_View()
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
+            elif Choice=="Economy":
+                Embed=discord.Embed(title="**Economy Settings ⚙️**",colour=0x00F3FF)
+                Embed.add_field(name="Work Command",value=f"> /work")
+                Embed.add_field(name="Rob Command",value=f"> /rob")
+                Embed.add_field(name="Crime Command",value=f"> /crime")
+                Embed.add_field(name="Slots Command",value=f"> /slot")
+                Embed.add_field(name="Blackjack Command",value=f"> /blackjack")
+                View=Economy_Settings_Menu_View()
+                await interaction.response.edit_message(content=None,embed=discord.Embed(description="economy"),view=View)
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
