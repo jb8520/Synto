@@ -61,6 +61,6 @@ class Other(commands.Cog):
         if File.endswith(".py"):
             with open(f"./{File}",'r',encoding='utf-8') as Python_File:
                 Total_Lines+=len(Python_File.readlines())
-        await interaction.response.send_message(embed=discord.Embed(title="Bot Status",description=f"Bot Uptime: {Uptime_TimeStamp}\nLines: {Total_Lines}\nPing: {Ping}",color=0x00F3FF),ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(title="Bot Status",description=f"Bot Uptime: {Uptime_TimeStamp}\nLines of code: {Total_Lines}\nPing: {Ping}",color=0x00F3FF),ephemeral=True)
 async def setup(bot:commands.Bot):
     await bot.add_cog(Other(bot))
