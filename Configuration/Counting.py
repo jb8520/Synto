@@ -43,8 +43,8 @@ class Counting_Menu_View(discord.ui.View):
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
             Embed=discord.Embed(title="Counting Settings Information ℹ️",colour=0x00F3FF)
-            Embed.add_field(name="Counting Channel",value="> The channel where members can use the bots counting feature",inline=False)
-            Embed.add_field(name="Double Count",value="> True/False: whether members should be able to count multiple times in a row. True they can, false they can't.",inline=False)
+            Embed.add_field(name="Counting Channel",value="> The channel where members can use the bots counting feature.",inline=False)
+            Embed.add_field(name="Double Count",value="> True/False: whether a member should be able to count multiple times in a row. True they can, false they can't.",inline=False)
             await interaction.response.send_message(embed=Embed,ephemeral=True)
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
