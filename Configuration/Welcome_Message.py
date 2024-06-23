@@ -137,7 +137,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             View=None
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),view=View)
+            await interaction.response.send_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),ephemeral=True,view=View)
             Configure(interaction.guild_id,Title=self.Title)
             self.stop()
         else:
@@ -148,7 +148,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             View=None
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),view=View)
+            await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True,view=View)
             Configure(interaction.guild_id,Description=self.Description)
             self.stop()
         else:
@@ -159,7 +159,7 @@ class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colou
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             View=None
-            await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour has been updated to:\n{self.Colour}",colour=0x00F3FF),view=View)
+            await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour has been updated to:\n{self.Colour}",colour=0x00F3FF),ephemeral=True,view=View)
             Configure(interaction.guild_id,Colour=self.Colour)
             self.stop()
         else:
