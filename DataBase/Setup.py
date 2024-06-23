@@ -45,3 +45,4 @@ def Add_Welcome_Message_Table():
 # Add_Counting_Table()
 # Add_Economy_Table()
 # Add_Economy_Settings_Table()
+#Add_Welcome_Message_Table()
