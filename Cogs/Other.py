@@ -18,7 +18,7 @@ class Other(commands.Cog):
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
             #Colour=hex(int(Welcome_Message_Query(member.guild.id,"colour"),16))
-            Colour=discord.Colour.from_str(Welcome_Message_Query(member.guild.id,"colour"))
+            Colour=discord.Colour.from_str("#"+Welcome_Message_Query(member.guild.id,"colour"))
             Embed=discord.Embed(title=Title,description=Description,color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
             Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
