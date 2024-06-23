@@ -40,3 +40,10 @@ def Configure(Guild_id,Channel_id=None,Title=None,Description=None,Colour=None,A
     Connection.commit()
     Cursor.close()
     Connection.close()
+def Remove(Guild_id):
+    Connection=DataBase_Connection()
+    Cursor=Connection.cursor()
+    Cursor.execute(f"DELETE FROM Welcome_Message WHERE guild_id='{Guild_id}'")
+    Connection.commit()
+    Cursor.close()
+    Connection.close()

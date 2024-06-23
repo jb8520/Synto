@@ -6,6 +6,7 @@ from Cogs.Auto_Vc import Auto_Vc_Buttons
 from DataBase.Welcome_Message import Query as Welcome_Message_Query
 from DataBase.Auto_Vc import Remove as Auto_Vc_Remove
 from DataBase.Counting import Remove as Counting_Remove
+from DataBase.Welcome_Message import Remove as Welcome_Message_Remove
 
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):
@@ -17,7 +18,12 @@ class Other(commands.Cog):
             Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
-            #Colour=hex(int(Welcome_Message_Query(member.guild.id,"colour"),16))
+            if "{member.mention}" in Title:
+                Position=Title.index("{member.mention}")
+                Title=f"{Title[:Position]}{member.mention}{Title[Position+16:]}"
+            if "{member.mention}" in Description:
+                Position=Description.index("{member.mention}")
+                Description=f"{Description[:Position]}{member.mention}{Description[Position+16:]}"
             Colour=discord.Colour.from_str("#"+Welcome_Message_Query(member.guild.id,"colour"))
             Embed=discord.Embed(title=f"{Title}",description=f"{Description}",color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
@@ -29,6 +35,7 @@ class Other(commands.Cog):
     async def guild_remove(self,guild:discord.guild):
         Auto_Vc_Remove(guild.id)
         Counting_Remove(guild.id)
+        Welcome_Message_Remove(guild.id)
     @app_commands.command(name="setup",description="Run this command to set the bot up")
     async def setup(self,interaction:discord.Interaction):
         Embed=discord.Embed(title="Synto Setup ⚙️",description="To configure the bot please use the `/configuration` command. In each section a button labelled ℹ️ will display information about each configurable option.\n\nFor any help/support surrounding the bot, please open a ticket in the [Synto Support Server](https://discord.gg/MdsMmJvaJt)",colour=0x00F3FF)
