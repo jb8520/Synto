@@ -128,9 +128,9 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
             self.stop()
 class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message Description"):
-    Description=discord.ui.TextInput(label="Enter your new welcome message description",style=discord.TextStyle.long,required=False,default=None)
+    Description=discord.ui.TextInput(label="Enter your new welcome message description",style=discord.TextStyle.long,required=False,default="None")
     async def on_submit(self,interaction:discord.Interaction):
-        print(self.Description==None)
+        print(self.Description=="None")
         if interaction.user.guild_permissions.administrator:
             await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Description=self.Description)
