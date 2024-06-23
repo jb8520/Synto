@@ -12,16 +12,18 @@ class Other(commands.Cog):
         self.bot=bot
     @commands.Cog.listener()
     async def on_member_join(self,member):
-        Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
-        Title=Welcome_Message_Query(member.guild.id,"title")
-        Description=Welcome_Message_Query(member.guild.id,"description")
-        Colour=Welcome_Message_Query(member.guild.id,"colour")  #0xXXXXXX
-        Embed=discord.Embed(title=Title,description=Description,color=Colour)
-        Embed.set_thumbnail(url=str(member.display_avatar.url))
-        Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
-        Embed.set_footer(text=f"ID: {str(member.id)}")
-        Embed.timestamp=datetime.datetime.now()
-        await Welcome_Channel.send(embed=Embed)
+        Activated=Welcome_Message_Query(member.guild.id,"activated")
+        if Activated:
+            Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
+            Title=Welcome_Message_Query(member.guild.id,"title")
+            Description=Welcome_Message_Query(member.guild.id,"description")
+            Colour=hex(int(Welcome_Message_Query(member.guild.id,"colour")),16)
+            Embed=discord.Embed(title=Title,description=Description,color=Colour)
+            Embed.set_thumbnail(url=str(member.display_avatar.url))
+            Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
+            Embed.set_footer(text=f"ID: {str(member.id)}")
+            Embed.timestamp=datetime.datetime.now()
+            await Welcome_Channel.send(embed=Embed)
     @commands.Cog.listener('on_guild_remove')
     async def guild_remove(self,guild:discord.guild):
         Auto_Vc_Remove(guild.id)

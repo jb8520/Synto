@@ -13,7 +13,7 @@ def Query(Guild_id,Query):
     Fetch=(Cursor.fetchone())[0]
     if Query=="activated":
         Fetch= True if Fetch=="True" else False
-    elif Query=="guild_id" or "channel_id":
+    elif Query=="guild_id" or Query=="channel_id":
         Fetch=int(Fetch)
     Connection.commit()
     Connection.close()
