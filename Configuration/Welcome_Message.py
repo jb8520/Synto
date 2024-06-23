@@ -130,8 +130,10 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
 class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message Description"):
     Description=discord.ui.TextInput(label="Enter your new welcome message description",style=discord.TextStyle.long,required=False)
     async def on_submit(self,interaction:discord.Interaction):
-        print(self.Description)
+        print(type(self.Description))
         if interaction.user.guild_permissions.administrator:
+            if self.Description=="":
+                self.Description=None
             await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Description=self.Description)
             self.stop()
@@ -142,6 +144,8 @@ class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colou
     Colour=discord.ui.TextInput(label="Enter your new welcome message colour",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
+            if self.Colour=="":
+                self.Colour=None
             await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour has been updated to:\n{self.Colour}",colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Colour=self.Colour)
             self.stop()
