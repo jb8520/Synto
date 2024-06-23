@@ -21,12 +21,9 @@ class MyBot(commands.Bot):
                           Auto_Vc.Bypass_Roles_View(),
                           Counting.Counting_Menu_View(),
                           Counting.Counting_Channel_View(),
-                          Counting.Counting_Double_Count_View().
+                          Counting.Counting_Double_Count_View(),
                           Welcome_Message.Welcome_Message_Menu_View(),
                           Welcome_Message.Welcome_Channel_View(),
-                          Welcome_Message.Welcome_Message_Title_Modal(),
-                          Welcome_Message.Welcome_Message_Description_Modal(),
-                          Welcome_Message.Welcome_Message_Colour_Modal(),
                           Welcome_Message.Welcome_Message_Activated_View()]
         for View in Persistent_Views:
             self.add_view(View)
