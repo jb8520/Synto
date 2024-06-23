@@ -17,7 +17,7 @@ class Other(commands.Cog):
             Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
-            Colour=hex(int(Welcome_Message_Query(member.guild.id,"colour")),16)
+            Colour=hex(int(Welcome_Message_Query(member.guild.id,"colour"),16))
             Embed=discord.Embed(title=Title,description=Description,color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
             Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
