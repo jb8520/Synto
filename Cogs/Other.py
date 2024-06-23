@@ -18,9 +18,6 @@ class Other(commands.Cog):
             Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
-            if "{member.mention}" in Title:
-                Position=Title.index("{member.mention}")
-                Title=f"{Title[:Position]}{member.mention}{Title[Position+16:]}"
             if "{member.mention}" in Description:
                 Position=Description.index("{member.mention}")
                 Description=f"{Description[:Position]}{member.mention}{Description[Position+16:]}"
