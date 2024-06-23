@@ -45,7 +45,6 @@ class Welcome_Message_Menu_View(discord.ui.View):
     @discord.ui.button(label="Title",style=discord.ButtonStyle.grey,row=0,custom_id="welcome_message_title")
     async def title(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
-            #await interaction.response.send_message(embed=discord.Embed(description="The welcome message title is currently set to"+Title,colour=0x00F3FF),ephemeral=True,view=View)
             View=Welcome_Message_Title_Modal()
             await interaction.response.send_modal(View)
             await View.wait()
@@ -64,12 +63,6 @@ class Welcome_Message_Menu_View(discord.ui.View):
     @discord.ui.button(label="Colour",style=discord.ButtonStyle.grey,row=1,custom_id="welcome_message_colour")
     async def colour(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
-            # View=Welcome_Message_Colour_View()
-            # Colour=Query(interaction.guild.id,'colour')
-            # if Colour is None:
-            #     await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour is currently not set",colour=0x00F3FF),ephemeral=True,view=View)
-            # else:
-            #     await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour is currently set to #{Colour}",colour=0x00F3FF),ephemeral=True,view=View)
             View=Welcome_Message_Colour_Modal()
             await interaction.response.send_modal(View)
             await View.wait()
@@ -109,7 +102,6 @@ class Welcome_Message_Menu_View(discord.ui.View):
             await interaction.message.edit(embed=self.Embed(interaction))
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
-
 class Welcome_Channel_View(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -125,12 +117,10 @@ class Welcome_Channel_Select(discord.ui.ChannelSelect):
             self.View_Self.stop()
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
-
 class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"):
     Title=discord.ui.TextInput(label="Enter your new welcome message title",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
-            View=None
             await interaction.response.send_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Title=self.Title)
             self.stop()
@@ -141,8 +131,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
     Description=discord.ui.TextInput(label="Enter your new welcome message description",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
-            View=None
-            await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True,view=View)
+            await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Description=self.Description)
             self.stop()
         else:
@@ -152,14 +141,12 @@ class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colou
     Colour=discord.ui.TextInput(label="Enter your new welcome message colour",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
-            View=None
-            await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour has been updated to:\n{self.Colour}",colour=0x00F3FF),ephemeral=True,view=View)
+            await interaction.response.send_message(embed=discord.Embed(description=f"The welcome message colour has been updated to:\n{self.Colour}",colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Colour=self.Colour)
             self.stop()
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
             self.stop()
-
 class Welcome_Message_Activated_View(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
