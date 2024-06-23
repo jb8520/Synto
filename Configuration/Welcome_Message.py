@@ -17,7 +17,7 @@ class Welcome_Message_Menu_View(discord.ui.View):
         if Channel_id==0:
             Embed.add_field(name="Welcome Channel",value=f"> #channel",inline=False)
         else:
-            Embed.add_field(name="Counting Channel",value=f"> {interaction.guild.get_channel(Channel_id).mention}",inline=False)
+            Embed.add_field(name="Welcome Channel",value=f"> {interaction.guild.get_channel(Channel_id).mention}",inline=False)
         Embed.add_field(name="Title",value=f"> {Title}",inline=False)
         if Description is None:
             Embed.add_field(name="Description",value="> None",inline=False)
@@ -137,7 +137,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             View=None
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+self.Title,colour=0x00F3FF),view=View)
+            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),view=View)
             Configure(interaction.guild_id,Title=self.Title)
             self.stop()
         else:
@@ -148,7 +148,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             View=None
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+self.Description,colour=0x00F3FF),view=View)
+            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),view=View)
             Configure(interaction.guild_id,Description=self.Description)
             self.stop()
         else:
