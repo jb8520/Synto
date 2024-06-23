@@ -130,7 +130,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
 class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message Description"):
     Description=discord.ui.TextInput(label="Enter your new welcome message description",style=discord.TextStyle.long,required=False)
     async def on_submit(self,interaction:discord.Interaction):
-        print(type(self.Description))
+        print(self.Description==None)
         if interaction.user.guild_permissions.administrator:
             if self.Description=="":
                 self.Description=None
