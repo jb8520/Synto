@@ -44,9 +44,10 @@ class Other(commands.Cog):
     @app_commands.command(name="setup",description="Run this command to set the bot up")
     async def setup(self,interaction:discord.Interaction):
         Embed=discord.Embed(title="Synto Setup ⚙️",description="To configure the bot please use the `/configuration` command. In each section a button labelled ℹ️ will display information about each configurable option.\n\nFor any help/support surrounding the bot, please open a ticket in the [Synto Support Server](https://discord.gg/MdsMmJvaJt)",colour=0x00F3FF)
-        Embed.add_field(name="Auto Vc",value="> To setup an auto vc generator, you must select an auto vc creator, an auto vc category and a member role.\n> The command `/control_panel` will send a message which allows members to control their voice channels.",inline=False)
-        Embed.add_field(name="Counting",value="> To enable counting, a counting channel needs to be selected in the counting section of the configuration command.",inline=False)
-        Embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/dkVKX_iG1FdV8cjqLuEmnz7ZB-5dAyN-kGYRMdnVXbk/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1160857627631292456/e908335849b2cc5ed76f6e08e31eb2db.png?format=webp&quality=lossless&width=935&height=935")
+        Embed.add_field(name="Auto Vc",value="> To setup an auto vc generator, you must select an auto vc creator, category and a member role within the configuration command.\n> The command `/control_panel` will send a message which allows members to control their voice channels.",inline=False)
+        Embed.add_field(name="Counting",value="> To enable counting, a counting channel needs to be selected within the configuration command.",inline=False)
+        Embed.add_field(name="Welcome Message",value="> To enable the welcome message functionality, a welcome channel needs to be and the feature needs to be activated from within the configuration command.")
+        Embed.set_thumbnail(url="https://media.discordapp.net/attachments/1166916938530816018/1254624501115912223/Synto_Profile.png?ex=667a2b9e&is=6678da1e&hm=061315c8fecb685fa44cccb2611a01f5567d40d5dd7db1f93a21e3986c669516&=&format=webp&quality=lossless&width=437&height=437")
         await interaction.response.send_message(embed=Embed)
     @app_commands.command(name="control_panel",description="Sends the auto vc control panel")
     async def auto_vc_control_panel(self,interaction:discord.Interaction):
