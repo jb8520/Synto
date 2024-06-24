@@ -87,7 +87,7 @@ class Select_Menu(discord.ui.Select):
                 else:
                     Embed.add_field(name="Description",value=f"> {Description}",inline=False)
                 if Colour is None:
-                    Embed.add_field(name="Colour",value="> None",inline=False)
+                    Embed.add_field(name="Colour",value="> #000000",inline=False)
                 else:
                     Embed.add_field(name="Colour",value=f"> #{Colour}",inline=False)
                 if Activated:

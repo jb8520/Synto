@@ -6,22 +6,28 @@ from Cogs.Auto_Vc import Auto_Vc_Buttons
 from DataBase.Welcome_Message import Query as Welcome_Message_Query
 from DataBase.Auto_Vc import Remove as Auto_Vc_Remove
 from DataBase.Counting import Remove as Counting_Remove
-from DataBase.Welcome_Message import Remove as Welcome_Message_Remove
+from DataBase.Welcome_Message import Configure as Welcome_Message_Configure, Remove as Welcome_Message_Remove
 
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):
         self.bot=bot
     @commands.Cog.listener()
     async def on_member_join(self,member):
+        Welcome_Message_Configure(member.guild.id)
         Activated=Welcome_Message_Query(member.guild.id,"activated")
         if Activated:
             Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
-            if "{member.mention}" in Description:
+            if Description=="None":
+                Description=None
+            elif "{member.mention}" in Description:
                 Position=Description.index("{member.mention}")
                 Description=f"{Description[:Position]}{member.mention}{Description[Position+16:]}"
-            Colour=discord.Colour.from_str("#"+Welcome_Message_Query(member.guild.id,"colour"))
+            Colour=Welcome_Message_Query(member.guild.id,"colour")
+            if Colour=="None":
+                Colour="000000"
+            Colour=discord.Colour.from_str("#"+Colour)
             Embed=discord.Embed(title=f"{Title}",description=f"{Description}",color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
             Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
