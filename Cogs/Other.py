@@ -17,11 +17,12 @@ class Other(commands.Cog):
         Activated=Welcome_Message_Query(member.guild.id,"activated")
         if Activated:
             Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
-            print(Welcome_Channel)
             if Welcome_Channel==None:
                 return
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
+            print(Description)
+            print(Description=="None")
             if Description=="None":
                 Description=None
             elif "{member.mention}" in Description:
