@@ -98,15 +98,12 @@ class Auto_Vcs_Menu_View(discord.ui.View):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
     @discord.ui.button(emoji="ℹ️",style=discord.ButtonStyle.blurple,row=0,custom_id="auto_vc_information")
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Embed=discord.Embed(title="Auto Voice Channel Settings Information ℹ️",colour=0x00F3FF)
-            Embed.add_field(name="Auto Vc Creator",value="> The permanent channel that will be used to create a new temporary voice channel",inline=False)
-            Embed.add_field(name="Moderator Roles",value="> The roles which will always be able to access any created voice channels, regardless if it is hidden/locked",inline=False)
-            Embed.add_field(name="Auto Vc Category",value="> The category in which the created voice channels will be located in",inline=False)
-            Embed.add_field(name="Member Role",value="> This should be the role that by default can access created voice channels",inline=False)
-            await interaction.response.send_message(embed=Embed,ephemeral=True)
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+        Embed=discord.Embed(title="Auto Voice Channel Settings Information ℹ️",colour=0x00F3FF)
+        Embed.add_field(name="Auto Vc Creator",value="> The permanent channel that will be used to create a new temporary voice channel",inline=False)
+        Embed.add_field(name="Moderator Roles",value="> The roles which will always be able to access any created voice channels, regardless if it is hidden/locked",inline=False)
+        Embed.add_field(name="Auto Vc Category",value="> The category in which the created voice channels will be located in",inline=False)
+        Embed.add_field(name="Member Role",value="> This should be the role that by default can access created voice channels",inline=False)
+        await interaction.response.send_message(embed=Embed,ephemeral=True)
     @discord.ui.button(emoji="🗑️",style=discord.ButtonStyle.red,row=1,custom_id="auto_vc_delete")
     async def delete(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:

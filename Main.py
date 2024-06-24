@@ -54,8 +54,12 @@ async def servers_command(ctx):
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         print(f"Server Count: {len(bot.guilds)}")
+        Servers="Servers:\n"
         for Server in bot.guilds:
-            print(Server)
+            Servers+=f"{Server}\n"
+        if Servers=="Servers:\n":
+            Servers+="None"
+        print(Servers)
 @bot.command()
 async def sync(ctx):
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):

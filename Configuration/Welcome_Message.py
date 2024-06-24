@@ -71,16 +71,13 @@ class Welcome_Message_Menu_View(discord.ui.View):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
     @discord.ui.button(emoji="ℹ️",style=discord.ButtonStyle.blurple,row=0,custom_id="welcome_message_information")
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Embed=discord.Embed(title="Welcome Message Settings Information ℹ️",colour=0x00F3FF)
-            Embed.add_field(name="Welcome Channel",value="> The channel where the welcome message will be sent if the feature is turned on.",inline=False)
-            Embed.add_field(name="Title",value="> The title of the welcome message.",inline=False)
-            Embed.add_field(name="Description",value="> The description of the welcome message. The description can contain a mention of the person who has just joined the server. Include the following within the description to mention the user: {member.mention}",inline=False)
-            Embed.add_field(name="Colour",value="> The colour of the welcome message embed. A new colour should be entered as the 6 digit part of a colour hex code. For example for the colour red, you would enter: FF0000",inline=False)
-            Embed.add_field(name="Activated",value="> Whether the welcome message functionality should be turned on or off.",inline=False)
-            await interaction.response.send_message(embed=Embed,ephemeral=True)
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+        Embed=discord.Embed(title="Welcome Message Settings Information ℹ️",colour=0x00F3FF)
+        Embed.add_field(name="Welcome Channel",value="> The channel where the welcome message will be sent if the feature is turned on.",inline=False)
+        Embed.add_field(name="Title",value="> The title of the welcome message.",inline=False)
+        Embed.add_field(name="Description",value="> The description of the welcome message. The description can contain a mention of the person who has just joined the server. Include the following within the description to mention the user: {member.mention}",inline=False)
+        Embed.add_field(name="Colour",value="> The colour of the welcome message embed. A new colour should be entered as the 6 digit part of a colour hex code. For example for the colour red, you would enter: FF0000",inline=False)
+        Embed.add_field(name="Activated",value="> Whether the welcome message functionality should be turned on or off.",inline=False)
+        await interaction.response.send_message(embed=Embed,ephemeral=True)
     @discord.ui.button(emoji="🗑️",style=discord.ButtonStyle.red,row=1,custom_id="welcome_message_delete")
     async def delete(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:

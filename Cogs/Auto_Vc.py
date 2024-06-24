@@ -161,7 +161,7 @@ class Auto_Vc(commands.Cog):
             overwrites={
                 member.guild.default_role:discord.PermissionOverwrite(view_channel=False,connect=False),
                 member.guild.get_role(Query(member.guild.id,"member_role")):discord.PermissionOverwrite(view_channel=True,connect=True),
-                member.guild.get_member(int(os.environ["BOT_ID"])):discord.PermissionOverwrite(view_channel=True,manage_channels=True,manage_permissions=True,manage_roles=True)}
+                }
             List=Query(member.guild.id,"bypass_roles")
             if List!=0:
                 for id in List:

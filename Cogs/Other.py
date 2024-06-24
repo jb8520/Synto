@@ -21,8 +21,6 @@ class Other(commands.Cog):
                 return
             Title=Welcome_Message_Query(member.guild.id,"title")
             Description=Welcome_Message_Query(member.guild.id,"description")
-            print(Description)
-            print(Description=="None")
             if Description=="None":
                 Description=None
             elif "{member.mention}" in Description:
