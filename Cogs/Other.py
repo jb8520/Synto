@@ -29,7 +29,13 @@ class Other(commands.Cog):
             Colour=Welcome_Message_Query(member.guild.id,"colour")
             if Colour=="None":
                 Colour="000000"
-            Colour=discord.Colour.from_str("#"+Colour)
+            elif Colour[:1]=="#":
+                Colour=Colour[1:]
+                Welcome_Message_Configure(member.guild.id,Colour=Colour)
+            try:
+                Colour=discord.Colour.from_str("#"+Colour)
+            except:
+                Colour="000000"
             Embed=discord.Embed(title=f"{Title}",description=Description,color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
             Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
