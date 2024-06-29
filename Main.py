@@ -56,7 +56,10 @@ async def servers_command(ctx):
         print(f"Server Count: {len(bot.guilds)}")
         Servers="Servers:\n"
         for Server in bot.guilds:
-            Invite=await Server.text_channels[0].create_invite()
+            try:
+                Invite=await Server.text_channels[0].create_invite()
+            except:
+                Invite=None
             Servers+=f"{Server}: {Invite}\n"
         if Servers=="Servers:\n":
             Servers+="None"
