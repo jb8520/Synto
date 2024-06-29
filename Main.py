@@ -56,7 +56,8 @@ async def servers_command(ctx):
         print(f"Server Count: {len(bot.guilds)}")
         Servers="Servers:\n"
         for Server in bot.guilds:
-            Servers+=f"{Server}\n"
+            Invite=Server.text_channels[0].create_invite()
+            Servers+=f"{Server}: {Invite}\n"
         if Servers=="Servers:\n":
             Servers+="None"
         print(Servers)
