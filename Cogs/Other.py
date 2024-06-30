@@ -35,7 +35,7 @@ class Other(commands.Cog):
             try:
                 Colour=discord.Colour.from_str("#"+Colour)
             except:
-                Colour="000000"
+                Colour="#000000"
             Embed=discord.Embed(title=f"{Title}",description=Description,color=Colour)
             Embed.set_thumbnail(url=str(member.display_avatar.url))
             Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
