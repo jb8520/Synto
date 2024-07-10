@@ -14,19 +14,19 @@ class Other(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self,member):
         Welcome_Message_Configure(member.guild.id)
-        Activated=Welcome_Message_Query(member.guild.id,"activated")
+        Activated=Welcome_Message_Query(member.guild.id,'activated')
         if Activated:
-            Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
+            Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,'channel_id'))
             if Welcome_Channel==None:
                 return
-            Title=Welcome_Message_Query(member.guild.id,"title")
-            Description=Welcome_Message_Query(member.guild.id,"description")
+            Title=Welcome_Message_Query(member.guild.id,'title')
+            Description=Welcome_Message_Query(member.guild.id,'description')
             if Description=="None":
                 Description=None
             elif "{member.mention}" in Description:
                 Position=Description.index("{member.mention}")
                 Description=f"{Description[:Position]}{member.mention}{Description[Position+16:]}"
-            Colour=Welcome_Message_Query(member.guild.id,"colour")
+            Colour=Welcome_Message_Query(member.guild.id,'colour')
             if Colour=="None":
                 Colour="000000"
             elif Colour[:1]=="#":
