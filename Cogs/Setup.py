@@ -2,6 +2,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from DataBase.Connection import DataBase_Connection
+
 from Configuration.Counting import Counting_Menu_View
 from DataBase.Counting import Configure as Counting_Configure, Query as Counting_Query
 from Configuration.Auto_Vc import Auto_Vcs_Menu_View
@@ -29,24 +31,26 @@ class Select_Menu(discord.ui.Select):
                 View=Select_Menu_View()
                 await interaction.response.edit_message(content="Synto Configuration Settings ⚙️",embed=None,view=View)
             elif Choice=="Counting":
-                Counting_Configure(interaction.guild.id)
-                Channel_id=Counting_Query(interaction.guild.id,'channel_id')
-                Double_Count=Counting_Query(interaction.guild.id,'double_count')
                 Embed=discord.Embed(title="**Counting Settings ⚙️**",colour=0x00F3FF)
+                Connection=DataBase_Connection()
+                Counting_Configure(interaction.guild.id,Connection=Connection)
+                Channel_id=Counting_Query(interaction.guild.id,'channel_id',Connection=Connection)
+                Double_Count=Counting_Query(interaction.guild.id,'double_count',Connection=Connection)
                 if Channel_id==0:
                     Embed.add_field(name="Counting Channel",value=f"> #channel",inline=False)
                 else:
                     Embed.add_field(name="Counting Channel",value=f"> {interaction.guild.get_channel(Channel_id).mention}",inline=False)
                 Embed.add_field(name="Double Count",value=f"> {Double_Count}",inline=False)
-                View=Counting_Menu_View()
+                View=Counting_Menu_View(Connection)
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
             elif Choice=="Auto Vcs":
                 Embed=discord.Embed(title="Auto Voice Channel Settings ⚙️",colour=0x00F3FF)
-                Auto_Vc_Configure(interaction.guild.id)
-                Vc_Creator_id=Auto_Vc_Query(interaction.guild.id,'vc_creator_id')
-                Vc_Category_id=Auto_Vc_Query(interaction.guild.id,'vc_category_id')
-                Member_Role_id=Auto_Vc_Query(interaction.guild.id,'member_role')
-                Bypass_Roles_ids=Auto_Vc_Query(interaction.guild.id,'bypass_roles')
+                Connection=DataBase_Connection()
+                Auto_Vc_Configure(interaction.guild.id,Connection=Connection)
+                Vc_Creator_id=Auto_Vc_Query(interaction.guild.id,'vc_creator_id',Connection=Connection)
+                Vc_Category_id=Auto_Vc_Query(interaction.guild.id,'vc_category_id',Connection=Connection)
+                Member_Role_id=Auto_Vc_Query(interaction.guild.id,'member_role',Connection=Connection)
+                Bypass_Roles_ids=Auto_Vc_Query(interaction.guild.id,'bypass_roles',Connection=Connection)
                 if Vc_Creator_id==0:
                     Embed.add_field(name="Auto Vc Creator",value=f"> #channel",inline=False)
                 else:
@@ -67,16 +71,17 @@ class Select_Menu(discord.ui.Select):
                     Embed.add_field(name="Member Role",value=f"> @role",inline=False)
                 else:
                     Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(Member_Role_id).mention}",inline=False)
-                View=Auto_Vcs_Menu_View()
+                View=Auto_Vcs_Menu_View(Connection)
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
             elif Choice=="Welcome Message":
                 Embed=discord.Embed(title="Welcome Message Settings ⚙️",colour=0x00F3FF)
-                Welcome_Message_Configure(interaction.guild.id)
-                Channel_id=Welcome_Message_Query(interaction.guild.id,'channel_id')
-                Title=Welcome_Message_Query(interaction.guild.id,'title')
-                Description=Welcome_Message_Query(interaction.guild.id,'description')
-                Colour=Welcome_Message_Query(interaction.guild.id,'colour')
-                Activated=Welcome_Message_Query(interaction.guild.id,'activated')
+                Connection=DataBase_Connection()
+                Welcome_Message_Configure(interaction.guild.id,Connection=Connection)
+                Channel_id=Welcome_Message_Query(interaction.guild.id,'channel_id',Connection=Connection)
+                Title=Welcome_Message_Query(interaction.guild.id,'title',Connection=Connection)
+                Description=Welcome_Message_Query(interaction.guild.id,'description',Connection=Connection)
+                Colour=Welcome_Message_Query(interaction.guild.id,'colour',Connection=Connection)
+                Activated=Welcome_Message_Query(interaction.guild.id,'activated',Connection=Connection)
                 if Channel_id==0:
                     Embed.add_field(name="Welcome Channel",value=f"> #channel",inline=False)
                 else:
@@ -95,7 +100,7 @@ class Select_Menu(discord.ui.Select):
                 else:
                     Activated="Off"
                 Embed.add_field(name="Activated",value=f"> {Activated}",inline=False)
-                View=Welcome_Message_Menu_View()
+                View=Welcome_Message_Menu_View(Connection)
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)

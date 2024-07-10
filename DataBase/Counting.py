@@ -25,8 +25,9 @@ def Update(Guild_id,Score,Query,Message_id=None,Author_id=None):
         Connection.commit()
     Cursor.close()
     Connection.close()
-def Query(Guild_id,Query):
-    Connection=DataBase_Connection()
+def Query(Guild_id,Query,Connection=None):
+    if Connection is None:
+        Connection=DataBase_Connection()
     Cursor=Connection.cursor()
     Cursor.execute(f"SELECT {Query} FROM Counting WHERE guild_id='{Guild_id}'")
     Fetch=Cursor.fetchone()
@@ -45,8 +46,9 @@ def Query(Guild_id,Query):
             return True
         elif Fetch[0]=="False":
             return False
-def Configure(Guild_id,Channel_id=None,Double_Count=None,Configure=False):
-    Connection=DataBase_Connection()
+def Configure(Guild_id,Channel_id=None,Double_Count=None,Configure=False,Connection=None):
+    if Connection is None:
+        Connection=DataBase_Connection()
     Cursor=Connection.cursor()
     if Configure:
         Cursor.execute(f"INSERT INTO Counting (guild_id,channel_id,highscore,current_score,message_id,author_id,double_count) VALUES ('{Guild_id}','0','0','0','0','0','False')")
