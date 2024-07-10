@@ -4,7 +4,7 @@ import Cogs.Setup as Setup
 from DataBase.Counting import Configure, Query
 
 class Counting_Menu_View(discord.ui.View):
-    def __init__(self,Connection):
+    def __init__(self,Connection=None):
         super().__init__(timeout=None)
         self.add_item(Setup.Select_Menu())
         self.Connection=Connection
@@ -54,7 +54,7 @@ class Counting_Menu_View(discord.ui.View):
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
 class Counting_Channel_View(discord.ui.View):
-    def __init__(self,Connection):
+    def __init__(self,Connection=None):
         super().__init__(timeout=None)
         self.add_item(Counting_Channel_Select(self,Connection))
 class Counting_Channel_Select(discord.ui.ChannelSelect):
@@ -70,7 +70,7 @@ class Counting_Channel_Select(discord.ui.ChannelSelect):
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 class Counting_Double_Count_View(discord.ui.View):
-    def __init__(self,Connection):
+    def __init__(self,Connection=None):
         super().__init__(timeout=None)
         self.Connection=Connection
     @discord.ui.button(emoji="✅",label="True",style=discord.ButtonStyle.grey,custom_id="double_count_true")
