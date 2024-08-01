@@ -9,10 +9,10 @@ def DataBase_Connection():
 def Query(Guild_id,Query):
     Connection=DataBase_Connection()
     Cursor=Connection.cursor()
-    Cursor.execute(f"SELECT {Query} FROM Auto_Vc WHERE guild_id='{Guild_id}'")
+    Cursor.execute(f"SELECT {Query} FROM Welcome_Message WHERE guild_id='{Guild_id}'")
     Fetch=(Cursor.fetchone())[0]
     if Query=="activated":
-        Fetch= True if Fetch=="True" else False
+        Fetch=True if Fetch=="True" else False
     Connection.commit()
     Connection.close()
     return Fetch
