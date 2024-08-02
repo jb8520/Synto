@@ -139,7 +139,7 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
     async def callback(self,interaction):
         if interaction.user.guild_permissions.administrator:
             Category=interaction.guild.get_channel(self.values[0].id)
-            Configure(interaction.guild_id,Vc_Category_id=Category.id,Connection=self.Connection)
+            Configure(interaction.guild_id,Vc_Category_id=Category.id)
             await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {Category.mention}",colour=0x00F3FF),view=None)
             self.View_Self.stop()
         else:

@@ -91,10 +91,10 @@ class Other(commands.Cog):
             if os.path.isdir(File):
                 for Filename in os.listdir(f"./{File}"):
                     if Filename.endswith(".py"):
-                        with open(f"./{File}/{Filename}",'r',encoding='utf-8') as Python_File:
+                        with open(f"./{File}/{Filename}","r",encoding="utf-8") as Python_File:
                             Total_Lines+=len(Python_File.readlines())
         if File.endswith(".py"):
-            with open(f"./{File}",'r',encoding='utf-8') as Python_File:
+            with open(f"./{File}","r",encoding="utf-8") as Python_File:
                 Total_Lines+=len(Python_File.readlines())
         await interaction.response.send_message(embed=discord.Embed(title="Bot Status",description=f"Bot Uptime: {Uptime_TimeStamp}\nLines of code: {Total_Lines}\nPing: {Ping}",color=0x00F3FF),ephemeral=True)
 async def setup(bot:commands.Bot):

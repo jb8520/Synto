@@ -10,7 +10,7 @@ class Counting_Cog(commands.Cog):
     @app_commands.command()
     async def counting_info(self,interaction:discord.Interaction):
         await interaction.response.send_message(embed=discord.Embed(title="**Server Info**",description=f"Highscore: {Query(interaction.guild.id,'highscore')}\n\nCurrent Count: {Query(interaction.guild.id,'current_score')}\n\nCounting Channel: {interaction.guild.get_channel(Query(interaction.guild.id,'channel_id')).mention}",colour=0x00f8ff),ephemeral=True)
-    @commands.Cog.listener("on_message")
+    @commands.Cog.listener('on_message')
     async def on_message(self,message:discord.Message):
         try:
             if Query(message.guild.id,'channel_id')==message.channel.id:
@@ -32,7 +32,7 @@ class Counting_Cog(commands.Cog):
                     Update(message.guild.id,0,'current_score')
         except:
             return
-    @commands.Cog.listener("on_message_delete")
+    @commands.Cog.listener('on_message_delete')
     async def on_message_delete(self,message:discord.message):
         try:
             if message.id==Query(message.guild.id,'message_id'):
