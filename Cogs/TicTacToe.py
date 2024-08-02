@@ -12,7 +12,7 @@ class TicTacToe_Cog(commands.Cog):
                 self.x=x
                 self.y=y
             async def callback(self,interaction:discord.Interaction):
-                view:view.TicTacToe=self.view
+                view:view.TicTacToe=self.view #type:ignore
                 if view.Current_player==view.Player_1==0:
                     view.Player_1=view.Current_player=interaction.user.id
                 elif view.Current_player==view.Player_2==0:
