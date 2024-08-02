@@ -131,7 +131,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
     Description=discord.ui.TextInput(label="Enter your new welcome message description",placeholder="Enter None to remove the description",style=discord.TextStyle.long,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
             if str(self.Description).lower()=="none":
                 self.Description="None"
             Configure(interaction.guild_id,Description=self.Description)
