@@ -56,7 +56,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         if interaction.user.id in interaction.client.Auto_Vc_Owners[interaction.guild.id]:
             Position=interaction.client.Auto_Vc_Owners[interaction.guild.id].index(interaction.user.id)
             Channel=interaction.guild.get_channel(interaction.client.Auto_Vcs[interaction.guild.id][Position])
-            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,"member_role"))
+            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,'member_role'))
             Permissions=Channel.overwrites_for(Member_Role)
             Permissions.connect=False
             await Channel.set_permissions(Member_Role,overwrite=Permissions)
@@ -68,7 +68,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         if interaction.user.id in interaction.client.Auto_Vc_Owners[interaction.guild.id]:
             Position=interaction.client.Auto_Vc_Owners[interaction.guild.id].index(interaction.user.id)
             Channel=interaction.guild.get_channel(interaction.client.Auto_Vcs[interaction.guild.id][Position])
-            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,"member_role"))
+            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,'member_role'))
             Permissions=Channel.overwrites_for(Member_Role)
             Permissions.connect=True
             await Channel.set_permissions(Member_Role,overwrite=Permissions)
@@ -80,7 +80,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         if interaction.user.id in interaction.client.Auto_Vc_Owners[interaction.guild.id]:
             Position=interaction.client.Auto_Vc_Owners[interaction.guild.id].index(interaction.user.id)
             Channel=interaction.guild.get_channel(interaction.client.Auto_Vcs[interaction.guild.id][Position])
-            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,"member_role"))
+            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,'member_role'))
             Permissions=Channel.overwrites_for(Member_Role)
             Permissions.view_channel=False
             await Channel.set_permissions(Member_Role,overwrite=Permissions)
@@ -92,7 +92,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         if interaction.user.id in interaction.client.Auto_Vc_Owners[interaction.guild.id]:
             Position=interaction.client.Auto_Vc_Owners[interaction.guild.id].index(interaction.user.id)
             Channel=interaction.guild.get_channel(interaction.client.Auto_Vcs[interaction.guild.id][Position])
-            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,"member_role"))
+            Member_Role=interaction.guild.get_role(Query(interaction.guild.id,'member_role'))
             Permissions=Channel.overwrites_for(Member_Role)
             Permissions.view_channel=True
             await Channel.set_permissions(Member_Role,overwrite=Permissions)
@@ -150,16 +150,16 @@ class Auto_Vc(commands.Cog):
         self.Auto_Vc_Number_Names=bot.Auto_Vc_Number_Names
     @commands.Cog.listener('on_voice_state_update')
     async def voice_update(self,member:discord.Member,before,after):
-        Vc_Creator_id=Query(member.guild.id,"vc_creator_id")
+        Vc_Creator_id=Query(member.guild.id,'vc_creator_id')
         if Vc_Creator_id==0:
             return
         Vc_Creator=self.bot.get_channel(Vc_Creator_id)
         if before.channel!=after.channel and after.channel==Vc_Creator:
             overwrites={
                 member.guild.default_role:discord.PermissionOverwrite(view_channel=False,connect=False),
-                member.guild.get_role(Query(member.guild.id,"member_role")):discord.PermissionOverwrite(view_channel=True,connect=True),
+                member.guild.get_role(Query(member.guild.id,'member_role')):discord.PermissionOverwrite(view_channel=True,connect=True),
                 member.guild.get_member(int(os.environ["BOT_ID"])):discord.PermissionOverwrite(view_channel=True,manage_channels=True,manage_permissions=True,manage_roles=True)}
-            List=Query(member.guild.id,"bypass_roles")
+            List=Query(member.guild.id,'bypass_roles')
             if List!=0:
                 for id in List:
                     Role=member.guild.get_role(id)
@@ -175,7 +175,7 @@ class Auto_Vc(commands.Cog):
                         break
                 if Number==0:
                     Number=len(self.Auto_Vcs[member.guild.id])+1
-            Channel=await member.guild.create_voice_channel(f"VC {Number}",category=self.bot.get_channel(Query(member.guild.id,"vc_category_id")),overwrites=overwrites)
+            Channel=await member.guild.create_voice_channel(f"VC {Number}",category=self.bot.get_channel(Query(member.guild.id,'vc_category_id')),overwrites=overwrites)
             await member.move_to(Channel)
             if member.guild.id in self.Auto_Vcs:
                 self.Auto_Vcs[member.guild.id].append(Channel.id)

@@ -117,7 +117,7 @@ class Welcome_Channel_Select(discord.ui.ChannelSelect):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
 class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"):
-    Title=discord.ui.TextInput(label="Please enter what you would like to update the welcome message title to",style=discord.TextStyle.short,required=True)
+    Title=discord.ui.TextInput(label="Enter your new welcome message title",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             await interaction.response.edit_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),ephemeral=True)
@@ -128,7 +128,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
             self.stop()
 
 class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message Description"):
-    Description=discord.ui.TextInput(label="Please enter what you would like to update the welcome message description to",style=discord.TextStyle.short,required=True)
+    Description=discord.ui.TextInput(label="Enter your new welcome message description",placeholder="Enter None to remove the description",style=discord.TextStyle.long,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             await interaction.response.edit_message(embed=discord.Embed(description="The welcome message description has been updated to:\n"+str(self.Description),colour=0x00F3FF),ephemeral=True)
@@ -141,7 +141,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
             self.stop()
 
 class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colour"):
-    Colour=discord.ui.TextInput(label="Please enter what you would like to update the welcome message colour to",style=discord.TextStyle.short,required=True)
+    Colour=discord.ui.TextInput(label="Enter your new welcome message colour",placeholder="Enter None to remove the colour",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
             Colour=str(self.Colour)
