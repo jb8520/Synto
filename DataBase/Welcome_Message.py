@@ -12,7 +12,7 @@ def Query(Guild_id,Query):
     Cursor.execute(f"SELECT {Query} FROM Welcome_Message WHERE guild_id='{Guild_id}'")
     Fetch=(Cursor.fetchone())[0]
     if Query=="activated":
-        Fetch= True if Fetch=="True" else False
+        Fetch=True if Fetch=="True" else False
     elif Query=="guild_id" or Query=="channel_id":
         Fetch=int(Fetch)
     Connection.commit()

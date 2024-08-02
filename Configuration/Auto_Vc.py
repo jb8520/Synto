@@ -138,18 +138,9 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
         self.View_Self=View_Self
     async def callback(self,interaction):
         if interaction.user.guild_permissions.administrator:
-            Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
-            if Vc_Category_id!=0:
-                try:
-                    Category=interaction.guild.get_channel(Vc_Category_id)
-                    await Category.set_permissions(interaction.guild.get_member(int(os.environ["BOT_ID"])),overwrite=None)
-                except:
-                    Error=True
-            New_Category=interaction.guild.get_channel(self.values[0].id)
-            Configure(interaction.guild_id,Vc_Category_id=New_Category.id)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {New_Category.mention}",colour=0x00F3FF),view=None)
-            overwrite=discord.PermissionOverwrite(view_channel=True,manage_channels=True,manage_permissions=True,manage_roles=True)
-            await New_Category.set_permissions(interaction.guild.get_member(int(os.environ["BOT_ID"])),overwrite=overwrite)
+            Category=interaction.guild.get_channel(self.values[0].id)
+            Configure(interaction.guild_id,Vc_Category_id=Category.id,Connection=self.Connection)
+            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {Category.mention}",colour=0x00F3FF),view=None)
             self.View_Self.stop()
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
