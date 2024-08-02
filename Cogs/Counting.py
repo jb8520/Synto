@@ -14,28 +14,28 @@ class Counting_Cog(commands.Cog):
     async def on_message(self,message:discord.Message):
         try:
             if Query(message.guild.id,'channel_id')==message.channel.id:
-                if int(message.content)-1==Query(message.guild.id,'current_score'):
-                    if message.author.id==Query(message.guild.id,'author_id') and not(Query(message.guild.id,'double_count')):
-                        if Query(message.guild.id,'current_score')>Query(message.guild.id,'highscore'):
-                            Update(message.guild.id,Query(message.guild.id,'current_score'),'highscore')
+                if int(message.content)-1==Query(message.guild.id,"current_score"):
+                    if message.author.id==Query(message.guild.id,"author_id") and not(Query(message.guild.id,"double_count")):
+                        if Query(message.guild.id,"current_score")>Query(message.guild.id,"highscore"):
+                            Update(message.guild.id,Query(message.guild.id,"current_score"),"highscore")
                         await message.channel.send(f"{message.author.mention} ruined the count at `{Query(message.guild.id,'current_score')}`! You can not double count. The next number is **`1`**")
                         await message.add_reaction("❌")
-                        Update(message.guild.id,0,'current_score')
+                        Update(message.guild.id,0,"current_score")
                     else:
                         await message.add_reaction("✅")
-                        Update(message.guild.id,int(message.content),'current_score',message.id,message.author.id)
+                        Update(message.guild.id,int(message.content),"current_score",message.id,message.author.id)
                 else:
-                    if Query(message.guild.id,'current_score')>Query(message.guild.id,'highscore'):
-                        Update(message.guild.id,Query(message.guild.id,'current_score'),'highscore')
+                    if Query(message.guild.id,"current_score")>Query(message.guild.id,"highscore"):
+                        Update(message.guild.id,Query(message.guild.id,"current_score"),"highscore")
                     await message.channel.send(f"{message.author.mention} ruined the count at `{Query(message.guild.id,'current_score')}`! The next number is **`1`**")
                     await message.add_reaction("❌")
-                    Update(message.guild.id,0,'current_score')
+                    Update(message.guild.id,0,"current_score")
         except:
             return
     @commands.Cog.listener("on_message_delete")
     async def on_message_delete(self,message:discord.message):
         try:
-            if message.id==Query(message.guild.id,'message_id'):
+            if message.id==Query(message.guild.id,"message_id"):
                 await message.channel.send(f"{message.author.mention} deleted their count of `{Query(message.guild.id,'current_score')}`. The next number is **`{Query(message.guild.id,'current_score')+1}`**")
         except:
             return

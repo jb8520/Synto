@@ -37,7 +37,7 @@ def Add_Economy_Settings_Table():
 def Add_Welcome_Message_Table():
     Connection=DataBase_Connection()
     Cursor=Connection.cursor()
-    Cursor.execute("CREATE TABLE IF NOT EXISTS Welcome_Message(guild_id text NOT NULL, channel_id text NOT NULL, title text NOT NULL, description text NOT NULL, colour text NOT NULL, activated text NOT NULL)")
+    Cursor.execute("CREATE TABLE IF NOT EXISTS Welcome_Message(guild_id int NOT NULL, channel_id int NOT NULL, title text NOT NULL, description text, colour int, activated text NOT NULL)")
     Connection.commit()
     Cursor.close()
     Connection.close()
@@ -45,4 +45,3 @@ def Add_Welcome_Message_Table():
 # Add_Counting_Table()
 # Add_Economy_Table()
 # Add_Economy_Settings_Table()
-# Add_Welcome_Message_Table()
