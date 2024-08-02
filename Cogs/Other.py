@@ -6,32 +6,54 @@ from Cogs.Auto_Vc import Auto_Vc_Buttons
 from DataBase.Welcome_Message import Query as Welcome_Message_Query
 from DataBase.Auto_Vc import Remove as Auto_Vc_Remove
 from DataBase.Counting import Remove as Counting_Remove
+from DataBase.Welcome_Message import Configure as Welcome_Message_Configure, Remove as Welcome_Message_Remove
 
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):
         self.bot=bot
     @commands.Cog.listener()
     async def on_member_join(self,member):
-        Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,"channel_id"))
-        Title=Welcome_Message_Query(member.guild.id,"title")
-        Description=Welcome_Message_Query(member.guild.id,"description")
-        Colour=Welcome_Message_Query(member.guild.id,"colour")  #0xXXXXXX
-        Embed=discord.Embed(title=Title,description=Description,color=Colour)
-        Embed.set_thumbnail(url=str(member.display_avatar.url))
-        Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
-        Embed.set_footer(text=f"ID: {str(member.id)}")
-        Embed.timestamp=datetime.datetime.now()
-        await Welcome_Channel.send(embed=Embed)
+        Welcome_Message_Configure(member.guild.id)
+        Activated=Welcome_Message_Query(member.guild.id,'activated')
+        if Activated:
+            Welcome_Channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,'channel_id'))
+            if Welcome_Channel==None:
+                return
+            Title=Welcome_Message_Query(member.guild.id,'title')
+            Description=Welcome_Message_Query(member.guild.id,'description')
+            if Description=="None":
+                Description=None
+            elif "{member.mention}" in Description:
+                Position=Description.index("{member.mention}")
+                Description=f"{Description[:Position]}{member.mention}{Description[Position+16:]}"
+            Colour=Welcome_Message_Query(member.guild.id,'colour')
+            if Colour=="None":
+                Colour="000000"
+            elif Colour[:1]=="#":
+                Colour=Colour[1:]
+                Welcome_Message_Configure(member.guild.id,Colour=Colour)
+            try:
+                Colour=discord.Colour.from_str("#"+Colour)
+            except:
+                Colour="#000000"
+            Embed=discord.Embed(title=f"{Title}",description=Description,color=Colour)
+            Embed.set_thumbnail(url=str(member.display_avatar.url))
+            Embed.add_field(name="Account Created",value=f"<t:{round(member.created_at.timestamp())}:R>",inline=False)
+            Embed.set_footer(text=f"ID: {str(member.id)}")
+            Embed.timestamp=datetime.datetime.now()
+            await Welcome_Channel.send(embed=Embed)
     @commands.Cog.listener('on_guild_remove')
     async def guild_remove(self,guild:discord.guild):
         Auto_Vc_Remove(guild.id)
         Counting_Remove(guild.id)
+        Welcome_Message_Remove(guild.id)
     @app_commands.command(name="setup",description="Run this command to set the bot up")
     async def setup(self,interaction:discord.Interaction):
         Embed=discord.Embed(title="Synto Setup ⚙️",description="To configure the bot please use the `/configuration` command. In each section a button labelled ℹ️ will display information about each configurable option.\n\nFor any help/support surrounding the bot, please open a ticket in the [Synto Support Server](https://discord.gg/MdsMmJvaJt)",colour=0x00F3FF)
-        Embed.add_field(name="Auto Vc",value="> To setup an auto vc generator, you must select an auto vc creator, an auto vc category and a member role.\n> The command `/control_panel` will send a message which allows members to control their voice channels.",inline=False)
-        Embed.add_field(name="Counting",value="> To enable counting, a counting channel needs to be selected in the counting section of the configuration command.",inline=False)
-        Embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/dkVKX_iG1FdV8cjqLuEmnz7ZB-5dAyN-kGYRMdnVXbk/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1160857627631292456/e908335849b2cc5ed76f6e08e31eb2db.png?format=webp&quality=lossless&width=935&height=935")
+        Embed.add_field(name="Auto Vc",value="> To setup an auto vc generator, you must select an auto vc creator, category and a member role within the configuration command.\n> The command `/control_panel` will send a message which allows members to control their voice channels.",inline=False)
+        Embed.add_field(name="Counting",value="> To enable counting, a counting channel needs to be selected within the configuration command.",inline=False)
+        Embed.add_field(name="Welcome Message",value="> To enable the welcome message functionality, a welcome channel needs to be selected and the feature needs to be activated from within the configuration command.")
+        Embed.set_thumbnail(url="https://media.discordapp.net/attachments/1166916938530816018/1254624501115912223/Synto_Profile.png?ex=667a2b9e&is=6678da1e&hm=061315c8fecb685fa44cccb2611a01f5567d40d5dd7db1f93a21e3986c669516&=&format=webp&quality=lossless&width=437&height=437")
         await interaction.response.send_message(embed=Embed)
     @app_commands.command(name="control_panel",description="Sends the auto vc control panel")
     async def auto_vc_control_panel(self,interaction:discord.Interaction):

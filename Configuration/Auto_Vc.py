@@ -98,15 +98,12 @@ class Auto_Vcs_Menu_View(discord.ui.View):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
     @discord.ui.button(emoji="ℹ️",style=discord.ButtonStyle.blurple,row=0,custom_id="auto_vc_information")
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Embed=discord.Embed(title="Auto Voice Channel Settings Information ℹ️",colour=0x00F3FF)
-            Embed.add_field(name="Auto Vc Creator",value="> The permanent channel that will be used to create a new temporary voice channel",inline=False)
-            Embed.add_field(name="Moderator Roles",value="> The roles which will always be able to access any created voice channels, regardless if it is hidden/locked",inline=False)
-            Embed.add_field(name="Auto Vc Category",value="> The category in which the created voice channels will be located in",inline=False)
-            Embed.add_field(name="Member Role",value="> This should be the role that by default can access created voice channels",inline=False)
-            await interaction.response.send_message(embed=Embed,ephemeral=True)
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+        Embed=discord.Embed(title="Auto Voice Channel Settings Information ℹ️",colour=0x00F3FF)
+        Embed.add_field(name="Auto Vc Creator",value="> The permanent channel that will be used to create a new temporary voice channel",inline=False)
+        Embed.add_field(name="Moderator Roles",value="> The roles which will always be able to access any created voice channels, regardless if it is hidden/locked",inline=False)
+        Embed.add_field(name="Auto Vc Category",value="> The category in which the created voice channels will be located in",inline=False)
+        Embed.add_field(name="Member Role",value="> This should be the role that by default can access created voice channels",inline=False)
+        await interaction.response.send_message(embed=Embed,ephemeral=True)
     @discord.ui.button(emoji="🗑️",style=discord.ButtonStyle.red,row=1,custom_id="auto_vc_delete")
     async def delete(self,interaction:discord.Interaction,button:discord.ui.Button):
         if interaction.user.guild_permissions.administrator:
@@ -141,18 +138,9 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
         self.View_Self=View_Self
     async def callback(self,interaction):
         if interaction.user.guild_permissions.administrator:
-            Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
-            if Vc_Category_id!=0:
-                try:
-                    Category=interaction.guild.get_channel(Vc_Category_id)
-                    await Category.set_permissions(interaction.guild.get_member(int(os.environ["BOT_ID"])),overwrite=None)
-                except:
-                    Error=True
-            New_Category=interaction.guild.get_channel(self.values[0].id)
-            Configure(interaction.guild_id,Vc_Category_id=New_Category.id)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {New_Category.mention}",colour=0x00F3FF),view=None)
-            overwrite=discord.PermissionOverwrite(view_channel=True,manage_channels=True,manage_permissions=True,manage_roles=True)
-            await New_Category.set_permissions(interaction.guild.get_member(int(os.environ["BOT_ID"])),overwrite=overwrite)
+            Category=interaction.guild.get_channel(self.values[0].id)
+            Configure(interaction.guild_id,Vc_Category_id=Category.id,Connection=self.Connection)
+            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {Category.mention}",colour=0x00F3FF),view=None)
             self.View_Self.stop()
         else:
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)

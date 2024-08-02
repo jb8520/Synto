@@ -25,7 +25,7 @@ def Configure(Guild_id,Channel_id=None,Title=None,Description=None,Colour=None,A
     Cursor.execute(f"SELECT guild_id FROM Welcome_Message WHERE guild_id='{Guild_id}'")
     Fetch=Cursor.fetchone()
     if Fetch is None:
-        Cursor.execute(f"INSERT INTO Welcome_Message(guild_id, channel_id, title, activated) VALUES ('{Guild_id}', 0, 'Welcome!','False')")
+        Cursor.execute(f"INSERT INTO Welcome_Message(guild_id, channel_id, title, description, colour, activated) VALUES ('{Guild_id}', '0', 'Welcome!','None','None','False')")
         Connection.commit()
     if Channel_id is not None:
         Cursor.execute(f"UPDATE Welcome_Message SET channel_id='{Channel_id}' WHERE guild_id='{Guild_id}'")
@@ -37,6 +37,13 @@ def Configure(Guild_id,Channel_id=None,Title=None,Description=None,Colour=None,A
         Cursor.execute(f"UPDATE Welcome_Message SET colour='{Colour}' WHERE guild_id='{Guild_id}'")
     if Activated is not None:
         Cursor.execute(f"UPDATE Welcome_Message SET activated='{Activated}' WHERE guild_id='{Guild_id}'")
+    Connection.commit()
+    Cursor.close()
+    Connection.close()
+def Remove(Guild_id):
+    Connection=DataBase_Connection()
+    Cursor=Connection.cursor()
+    Cursor.execute(f"DELETE FROM Welcome_Message WHERE guild_id='{Guild_id}'")
     Connection.commit()
     Cursor.close()
     Connection.close()

@@ -50,12 +50,24 @@ class MyBot(commands.Bot):
 bot=MyBot()
 
 @bot.command()
-async def servers_command(ctx):
+async def servers_command(ctx,invite="off"):
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         print(f"Server Count: {len(bot.guilds)}")
+        Servers="Servers:\n"
+        if invite.lower()=="on":
+            Invites_Activated=True
         for Server in bot.guilds:
-            print(Server)
+            Servers+=f"{Server}"
+            if Invites_Activated:
+                try:
+                    Invite=await Server.text_channels[0].create_invite()
+                except:
+                    Invite=None
+                Servers+=f": {Invite}\n"
+        if Servers=="Servers:\n":
+            Servers+="None"
+        print(Servers)
 @bot.command()
 async def sync(ctx):
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):

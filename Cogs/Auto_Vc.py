@@ -3,9 +3,6 @@ from discord.ext import commands
 
 from DataBase.Auto_Vc import Query
 
-from dotenv import load_dotenv
-load_dotenv()
-
 class User_Limit_Modal(discord.ui.Modal,title="User Limit"):
     Selected_Limit=discord.ui.TextInput(label="Enter the User Limit",style=discord.TextStyle.short,placeholder="Enter 0 for no user limit",required=True)
     async def on_submit(self,interaction:discord.Interaction):
