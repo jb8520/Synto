@@ -120,7 +120,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
     Title=discord.ui.TextInput(label="Enter your new welcome message title",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         if interaction.user.guild_permissions.administrator:
-            await interaction.response.edit_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(description="The welcome message title has been updated:\n"+str(self.Title),colour=0x00F3FF),ephemeral=True)
             Configure(interaction.guild_id,Title=self.Title)
             self.stop()
         else:
