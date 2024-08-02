@@ -1,4 +1,4 @@
-import mysql.connector, os, asyncio
+import mysql.connector, os
 
 from dotenv import load_dotenv
 load_dotenv()
