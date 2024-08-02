@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Auto_Vcs_Menu_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Setup.Select_Menu())
         self.Connection=Connection
@@ -114,7 +114,7 @@ class Auto_Vcs_Menu_View(discord.ui.View):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
 
 class Vc_Creator_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Vc_Creator_Select(self,Connection))
 class Vc_Creator_Select(discord.ui.ChannelSelect):
@@ -131,7 +131,7 @@ class Vc_Creator_Select(discord.ui.ChannelSelect):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
 class Vc_Category_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Vc_Category_Select(self,Connection))
 class Vc_Category_Select(discord.ui.ChannelSelect):
@@ -149,7 +149,7 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
 class Member_Role_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Member_Role_Select(self,Connection))
 class Member_Role_Select(discord.ui.RoleSelect):
@@ -166,7 +166,7 @@ class Member_Role_Select(discord.ui.RoleSelect):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
 class Bypass_Roles_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Bypass_Roles_Select(self,Connection))
 class Bypass_Roles_Select(discord.ui.RoleSelect):

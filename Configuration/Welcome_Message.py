@@ -4,7 +4,7 @@ import Cogs.Setup as Setup
 from DataBase.Welcome_Message import Configure, Query
 
 class Welcome_Message_Menu_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Setup.Select_Menu())
         self.Connection=Connection
@@ -102,7 +102,7 @@ class Welcome_Message_Menu_View(discord.ui.View):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
 
 class Welcome_Channel_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.add_item(Welcome_Channel_Select(self,Connection))
 class Welcome_Channel_Select(discord.ui.ChannelSelect):
@@ -119,7 +119,7 @@ class Welcome_Channel_Select(discord.ui.ChannelSelect):
             await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
 
 class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         self.Connection=Connection
     Title=discord.ui.TextInput(label="Enter your new welcome message title",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
@@ -132,7 +132,7 @@ class Welcome_Message_Title_Modal(discord.ui.Modal,title="Welcome Message Title"
             self.stop()
 
 class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message Description"):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         self.Connection=Connection
     Description=discord.ui.TextInput(label="Enter your new welcome message description",placeholder="Enter None to remove the description",style=discord.TextStyle.long,required=True)
     async def on_submit(self,interaction:discord.Interaction):
@@ -147,7 +147,7 @@ class Welcome_Message_Description_Modal(discord.ui.Modal,title="Welcome Message 
             self.stop()
 
 class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colour"):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         self.Connection=Connection
     Colour=discord.ui.TextInput(label="Enter your new welcome message colour",placeholder="Enter None to remove the colour",style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
@@ -172,7 +172,7 @@ class Welcome_Message_Colour_Modal(discord.ui.Modal,title="Welcome Message Colou
             self.stop()
 
 class Welcome_Message_Activated_View(discord.ui.View):
-    def __init__(self,Connection=None):
+    def __init__(self,Connection):
         super().__init__(timeout=None)
         self.Connection=Connection
     @discord.ui.button(emoji="✅",label="On",style=discord.ButtonStyle.grey,custom_id="welcome_channel_true")
