@@ -1,4 +1,4 @@
-import discord, os, datetime
+import discord, os, traceback, datetime
 from discord.ext import commands
 
 import Cogs.Auto_Vc, Cogs.Setup
@@ -50,7 +50,7 @@ class MyBot(commands.Bot):
 bot=MyBot()
 
 @bot.command()
-async def servers_command(ctx,invite="off"):
+async def servers_command(ctx:commands.Context,invite): #="off"
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         print(f"Server Count: {len(bot.guilds)}")
@@ -68,11 +68,39 @@ async def servers_command(ctx,invite="off"):
         if Servers=="Servers:\n":
             Servers+="None"
         print(Servers)
+
 @bot.command()
-async def sync(ctx):
+async def sync(ctx:commands.Context):
     if ctx.author.id==int(os.environ["BOT_OWNER_ID"]):
         await ctx.message.delete()
         await bot.tree.sync()
         print("Synced Commands to the Tree")
 
+
+@bot.event()
+async def on_command_error(ctx:commands.Context,error:commands.CommandError):
+    
+    Error=getattr(error,'original',error)
+    
+    Ignored_Errors=(commands.CommandNotFound,)
+
+    if isinstance(Error,Ignored_Errors):
+        return
+    
+    Error_Channel=bot.get_guild(os.environ["SUPPORT_SERVER_ID"]).get_channel(os.environ["ERROR_LOG_ID"])
+    
+    Embed=discord.Embed(title="Prefix Command Error",colour=0xff0000)
+    
+    if isinstance(Error,commands.BadArgument):
+        Embed.add_field(name="Error Type:",value="> BadArgument")
+        print(type(error))
+        print(error)
+        try:
+            print(error.args)
+            print(error[0])
+        except:
+            print("error")
+        await Error_Channel.send(embed=Embed) 
+    else:
+        traceback.print_exc(error)
 bot.run(os.environ["BOT_TOKEN"])

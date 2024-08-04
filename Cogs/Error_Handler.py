@@ -1,4 +1,4 @@
-import discord, os
+import discord, os, sys, traceback
 from discord import app_commands
 from discord.ext import commands
 
@@ -10,6 +10,12 @@ load_dotenv()
 class Error_Handler(commands.Cog):
     def __init__(self,bot:commands.bot):
         self.bot=bot
+
+    async def on_error(self,event, *args, **kwargs):
+        Error_Traceback=sys.exc_info()
+        print(Error_Traceback)
+
+
     @commands.Cog.listener()
     async def on_app_command_error(self,interaction:discord.Interaction,error:app_commands.AppCommandError):
         if hasattr(interaction.command, 'on_error'):
@@ -27,11 +33,11 @@ class Error_Handler(commands.Cog):
 
         if isinstance(Error,Ignored_Errors):
             return
-        
+        commands.BotMissingPermissions
         Error_Channel=interaction.client.get_guild(os.environ["SUPPORT_SERVER_ID"]).get_channel(os.environ["ERROR_LOG_ID"])
         Embed=discord.Embed(title="App Command Error",colour=0xff0000)
         if isinstance(Error,commands.BadArgument):
-            Embed.add_field(name="Error Type:",value="> BadArgument")
+            Embed.add_field(name="Error Type:",value="> BotMissingPermissions")
             print(type(error))
             print(error)
             try:
@@ -40,6 +46,8 @@ class Error_Handler(commands.Cog):
             except:
                 print("error")
             await Error_Channel.send(embed=Embed)
+        else:
+            traceback.print_exc(error)
 
 
 
