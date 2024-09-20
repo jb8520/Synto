@@ -1,7 +1,9 @@
-import discord, os
+import discord
+
+import Checks
 
 import Cogs.Setup as Setup
-from DataBase.Auto_Vc import Configure, Query
+from DataBase.Auto_Vc import Query, Configure, Vc_Channel_Query, Vc_Category_Query, Member_Role_Query, Moderator_Roles_Query
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -12,90 +14,95 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         self.add_item(Setup.Select_Menu())
     def Embed(self,interaction):
         Embed=discord.Embed(title="Auto Voice Channel Settings ⚙️",colour=0x00F3FF)
-        Vc_Creator_id=Query(interaction.guild.id,'vc_creator_id')
-        Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
-        Member_Role=Query(interaction.guild.id,'member_role')
-        Bypass_Roles=Query(interaction.guild.id,'bypass_roles')
-        if Vc_Creator_id==0:
+        # Vc_Creator_id=Query(interaction.guild.id,'vc_creator_id')
+        # Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
+        # Member_Role=Query(interaction.guild.id,'member_role')
+        # Bypass_Roles=Query(interaction.guild.id,'bypass_roles')
+        vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list=Query(interaction.guild.id)
+        if vc_creator_id==0:
             Embed.add_field(name="Auto Vc Creator",value=f"> #channel",inline=False)
         else:
-            Embed.add_field(name="Auto Vc Creator",value=f"> {interaction.guild.get_channel(Query(interaction.guild.id,'vc_creator_id')).mention}",inline=False)
-        if Bypass_Roles==0:
+            Embed.add_field(name="Auto Vc Creator",value=f"> {interaction.guild.get_channel(vc_creator_id).mention}",inline=False)
+        if moderator_roles_ids_list==0:
             Embed.add_field(name="Moderator Roles",value=f"> @moderator roles",inline=False)
         else:
             Roles=""
-            for Role_id in Query(interaction.guild.id,'bypass_roles'):
+            for Role_id in moderator_roles_ids_list:
                 Roles+=f"{interaction.guild.get_role(Role_id).mention}, "
             Roles=Roles[:-2]
             Embed.add_field(name="Moderator Roles",value=f"> {Roles}",inline=False)
-        if Vc_Category_id==0:
+        if vc_category_id==0:
             Embed.add_field(name="Auto Vc Category",value=f"> #category",inline=False)
         else:
-            Embed.add_field(name="Auto Vc Category",value=f"> {interaction.guild.get_channel(Query(interaction.guild.id,'vc_category_id')).mention}",inline=False)
-        if Member_Role==0:
+            Embed.add_field(name="Auto Vc Category",value=f"> {interaction.guild.get_channel(vc_category_id).mention}",inline=False)
+        if member_role_id==0:
             Embed.add_field(name="Member Role",value=f"> @role",inline=False)
         else:
-            Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(Query(interaction.guild.id,'member_role')).mention}",inline=False)
+            Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(member_role_id).mention}",inline=False)
         return Embed
     @discord.ui.button(label="Vc Creator",style=discord.ButtonStyle.grey,row=0,custom_id="vc_creator")
     async def vc_creator(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Vc_Creator_id=Query(interaction.guild.id,'vc_creator_id')
-            if Vc_Creator_id!=0:
-                Channel=interaction.guild.get_channel(Vc_Creator_id).mention
-            else:
-                Channel="#channel"
-            View=Vc_Creator_View()
-            await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Creator is currently set to {Channel}",colour=0x00F3FF),ephemeral=True,view=View)
-            await View.wait()
-            await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        vc_creator_id=Vc_Channel_Query(interaction.guild.id)
+        if vc_creator_id!=0:
+            vc_creato=interaction.guild.get_channel(vc_creator_id).mention
         else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+            vc_creato="#channel"
+        view=Vc_Creator_View()
+        await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Creator is currently set to {vc_creato}",colour=0x00F3FF),ephemeral=True,view=view)
+        await view.wait()
+        await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
     @discord.ui.button(label="Moderator Roles",style=discord.ButtonStyle.grey,row=0,custom_id="bypass_roles")
     async def bypass_roles(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Bypass_Roles=Query(interaction.guild.id,'bypass_roles')
-            if Bypass_Roles!=0:
-                Roles=""
-                for Role_id in Bypass_Roles:
-                    Roles+=f"{interaction.guild.get_role(Role_id).mention}, "
-                Roles=Roles[:-2]
-            else:                
-                Roles="@moderator roles"
-            View=Bypass_Roles_View()
-            await interaction.response.send_message(embed=discord.Embed(description=f"The Moderator Roles are currently set as: {Roles}",colour=0x00F3FF),ephemeral=True,view=View)
-            await View.wait()
-            await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        moderator_roles_ids_list=Moderator_Roles_Query(interaction.guild.id)
+        if moderator_roles_ids_list!=0:
+            moderator_roles=""
+            for role_id in moderator_roles_ids_list:
+                moderator_roles+=f"{interaction.guild.get_role(role_id).mention}, "
+            moderator_roles=moderator_roles[:-2]
+        else:                
+            moderator_roles="@moderator roles"
+        view=Bypass_Roles_View()
+        await interaction.response.send_message(embed=discord.Embed(description=f"The Moderator Roles are currently set as: {moderator_roles}",colour=0x00F3FF),ephemeral=True,view=view)
+        await view.wait()
+        await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
     @discord.ui.button(label="Vc Category",style=discord.ButtonStyle.grey,row=1,custom_id="vc_category")
     async def vc_Category(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
-            if Vc_Category_id!=0:
-                Category=interaction.guild.get_channel(Vc_Category_id).mention
-            else:
-                Category="#category"
-            View=Vc_Category_View()
-            await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Category is currently set to {Category}",colour=0x00F3FF),ephemeral=True,view=View)
-            await View.wait()
-            await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        vc_category_id=Vc_Category_Query(interaction.guild.id)
+        if vc_category_id!=0:
+            vc_category=interaction.guild.get_channel(vc_category_id).mention
         else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+            vc_category="#category"
+        view=Vc_Category_View()
+        await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Category is currently set to {vc_category}",colour=0x00F3FF),ephemeral=True,view=view)
+        await view.wait()
+        await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
     @discord.ui.button(label="Member Role",style=discord.ButtonStyle.grey,row=1,custom_id="member_role")
     async def member_role(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            Member_Role=Query(interaction.guild.id,'member_role')
-            if Member_Role!=0:
-                Role=interaction.guild.get_role(Member_Role).mention
-            else:
-                Role="#role"
-            View=Member_Role_View()
-            await interaction.response.send_message(embed=discord.Embed(description=f"The Member Role is currently set to {Role}",colour=0x00F3FF),ephemeral=True,view=View)
-            await View.wait()
-            await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        member_role_id=Member_Role_Query(interaction.guild.id)
+        if member_role_id!=0:
+            member_role=interaction.guild.get_role(member_role_id).mention
         else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+            member_role="#role"
+        view=Member_Role_View()
+        await interaction.response.send_message(embed=discord.Embed(description=f"The Member Role is currently set to {member_role}",colour=0x00F3FF),ephemeral=True,view=view)
+        await view.wait()
+        await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
     @discord.ui.button(emoji="ℹ️",style=discord.ButtonStyle.blurple,row=0,custom_id="auto_vc_information")
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
         Embed=discord.Embed(title="Auto Voice Channel Settings Information ℹ️",colour=0x00F3FF)
@@ -106,11 +113,12 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         await interaction.response.send_message(embed=Embed,ephemeral=True)
     @discord.ui.button(emoji="🗑️",style=discord.ButtonStyle.red,row=1,custom_id="auto_vc_delete")
     async def delete(self,interaction:discord.Interaction,button:discord.ui.Button):
-        if interaction.user.guild_permissions.administrator:
-            await interaction.response.defer()
-            await interaction.message.delete()
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this button",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        await interaction.response.defer()
+        await interaction.message.delete()
 
 class Vc_Creator_View(discord.ui.View):
     def __init__(self):
@@ -121,12 +129,15 @@ class Vc_Creator_Select(discord.ui.ChannelSelect):
         super().__init__(placeholder="Vc Creator",min_values=1,max_values=1,channel_types=[discord.ChannelType.voice],custom_id="vc_creator_select")
         self.View_Self=View_Self
     async def callback(self,interaction):
-        if interaction.user.guild_permissions.administrator:
-            Configure(interaction.guild_id,Vc_Creator_id=self.values[0].id)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc creator channel to {self.values[0].mention}",colour=0x00F3FF),view=None)
-            self.View_Self.stop()
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        vc_creator=self.values[0]
+        vc_creator_id=vc_creator
+        Configure(interaction.guild_id,vc_creator_id=vc_creator_id)
+        await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc creator channel to {self.values[0].mention}",colour=0x00F3FF),view=None)
+        self.View_Self.stop()
 
 class Vc_Category_View(discord.ui.View):
     def __init__(self):
@@ -137,13 +148,15 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
         super().__init__(placeholder="Auto Vc Category",min_values=1,max_values=1,channel_types=[discord.ChannelType.category],custom_id="vc_category_select")
         self.View_Self=View_Self
     async def callback(self,interaction):
-        if interaction.user.guild_permissions.administrator:
-            Category=interaction.guild.get_channel(self.values[0].id)
-            Configure(interaction.guild_id,Vc_Category_id=Category.id)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {Category.mention}",colour=0x00F3FF),view=None)
-            self.View_Self.stop()
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        vc_category=interaction.guild.get_channel(self.values[0].id)
+        vc_category_id=vc_category.id
+        Configure(interaction.guild_id,vc_category_id=vc_category_id)
+        await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {vc_category.mention}",colour=0x00F3FF),view=None)
+        self.View_Self.stop()
 
 class Member_Role_View(discord.ui.View):
     def __init__(self):
@@ -154,12 +167,14 @@ class Member_Role_Select(discord.ui.RoleSelect):
         super().__init__(placeholder="Member Role",min_values=1,max_values=1,custom_id="member_role_select")
         self.View_Self=View_Self
     async def callback(self,interaction):
-        if interaction.user.guild_permissions.administrator:
-            Configure(interaction.guild_id,Member_Role=self.values[0].id)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the member role to {self.values[0].mention}",colour=0x00F3FF),view=None)
-            self.View_Self.stop()
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        member_role_id=self.values[0].id
+        Configure(interaction.guild_id,member_role_id=member_role_id)
+        await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the member role to {self.values[0].mention}",colour=0x00F3FF),view=None)
+        self.View_Self.stop()
 
 class Bypass_Roles_View(discord.ui.View):
     def __init__(self):
@@ -170,15 +185,16 @@ class Bypass_Roles_Select(discord.ui.RoleSelect):
         super().__init__(placeholder="Moderator Roles",min_values=1,max_values=25,custom_id="bypass_roles_select")
         self.View_Self=View_Self
     async def callback(self,interaction):
-        if interaction.user.guild_permissions.administrator:
-            ids=[]
-            Roles=""
-            for Role in self.values:
-                ids.append(Role.id)
-                Roles+=f"{Role.mention}, "
-            Roles=Roles[:-2]
-            Configure(interaction.guild_id,Bypass_Roles=ids)
-            await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the moderator roles: {Roles}",colour=0x00F3FF),view=None)
-            self.View_Self.stop()
-        else:
-            await interaction.response.send_message("❌ You need to have the administrator permission to use this command",ephemeral=True)
+        allowed,error_message=Checks.Admin_Only_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        moderator_roles_ids_list=[]
+        Roles=""
+        for Role in self.values:
+            moderator_roles_ids_list.append(Role.id)
+            Roles+=f"{Role.mention}, "
+        Roles=Roles[:-2]
+        Configure(interaction.guild_id,moderator_roles_ids_list=moderator_roles_ids_list)
+        await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the moderator roles: {Roles}",colour=0x00F3FF),view=None)
+        self.View_Self.stop()

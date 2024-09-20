@@ -42,31 +42,32 @@ class Select_Menu(discord.ui.Select):
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
             elif Choice=="Auto Vcs":
                 Embed=discord.Embed(title="Auto Voice Channel Settings ⚙️",colour=0x00F3FF)
-                Auto_Vc_Configure(interaction.guild.id)
-                Vc_Creator_id=Auto_Vc_Query(interaction.guild.id,'vc_creator_id')
-                Vc_Category_id=Auto_Vc_Query(interaction.guild.id,'vc_category_id')
-                Member_Role_id=Auto_Vc_Query(interaction.guild.id,'member_role')
-                Bypass_Roles_ids=Auto_Vc_Query(interaction.guild.id,'bypass_roles')
-                if Vc_Creator_id==0:
+                # Auto_Vc_Configure(interaction.guild.id)
+                # Vc_Creator_id=Auto_Vc_Query(interaction.guild.id,'vc_creator_id')
+                # Vc_Category_id=Auto_Vc_Query(interaction.guild.id,'vc_category_id')
+                # Member_Role_id=Auto_Vc_Query(interaction.guild.id,'member_role')
+                # Bypass_Roles_ids=Auto_Vc_Query(interaction.guild.id,'bypass_roles')
+                vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list=Auto_Vc_Query(interaction.guild.id)
+                if vc_creator_id==0:
                     Embed.add_field(name="Auto Vc Creator",value=f"> #channel",inline=False)
                 else:
-                    Embed.add_field(name="Auto Vc Creator",value=f"> {interaction.guild.get_channel(Vc_Creator_id).mention}",inline=False)
-                if Bypass_Roles_ids==0:
+                    Embed.add_field(name="Auto Vc Creator",value=f"> {interaction.guild.get_channel(vc_creator_id).mention}",inline=False)
+                if moderator_roles_ids_list==0:
                     Embed.add_field(name="Moderator Roles",value=f"> @moderator roles",inline=False)
                 else:
                     Roles=""
-                    for Role_id in Bypass_Roles_ids:
+                    for Role_id in moderator_roles_ids_list:
                         Roles+=f"{interaction.guild.get_role(Role_id).mention}, "
                     Roles=Roles[:-2]
                     Embed.add_field(name="Moderator Roles",value=f"> {Roles}",inline=False)
-                if Vc_Category_id==0:
+                if vc_category_id==0:
                     Embed.add_field(name="Auto Vc Category",value=f"> #category",inline=False)
                 else:
-                    Embed.add_field(name="Auto Vc Category",value=f"> {interaction.guild.get_channel(Vc_Category_id).mention}",inline=False)
-                if Member_Role_id==0:
+                    Embed.add_field(name="Auto Vc Category",value=f"> {interaction.guild.get_channel(vc_category_id).mention}",inline=False)
+                if member_role_id==0:
                     Embed.add_field(name="Member Role",value=f"> @role",inline=False)
                 else:
-                    Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(Member_Role_id).mention}",inline=False)
+                    Embed.add_field(name="Member Role",value=f"> {interaction.guild.get_role(member_role_id).mention}",inline=False)
                 View=Auto_Vcs_Menu_View()
                 await interaction.response.edit_message(content=None,embed=Embed,view=View)
             elif Choice=="Welcome Message":
