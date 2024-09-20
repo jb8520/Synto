@@ -3,7 +3,7 @@ import discord
 import Checks
 
 import Cogs.Setup as Setup
-from DataBase.Auto_Vc import Query, Configure, Vc_Channel_Query, Vc_Category_Query, Member_Role_Query, Moderator_Roles_Query
+from DataBase.Auto_Vc import Query, Configure, Vc_Creator_Query, Vc_Category_Query, Member_Role_Query, Moderator_Roles_Query
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -46,13 +46,13 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
-        vc_creator_id=Vc_Channel_Query(interaction.guild.id)
+        vc_creator_id,error_message=Vc_Creator_Query(interaction.guild.id)
         if vc_creator_id!=0:
-            vc_creato=interaction.guild.get_channel(vc_creator_id).mention
+            vc_creator=interaction.guild.get_channel(vc_creator_id).mention
         else:
-            vc_creato="#channel"
+            vc_creator="#channel"
         view=Vc_Creator_View()
-        await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Creator is currently set to {vc_creato}",colour=0x00F3FF),ephemeral=True,view=view)
+        await interaction.response.send_message(embed=discord.Embed(description=f"The Auto Vc Creator is currently set to {vc_creator}",colour=0x00F3FF),ephemeral=True,view=view)
         await view.wait()
         await interaction.message.edit(embed=self.Embed(interaction),view=Auto_Vcs_Menu_View())
     @discord.ui.button(label="Moderator Roles",style=discord.ButtonStyle.grey,row=0,custom_id="bypass_roles")
@@ -79,7 +79,7 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
-        vc_category_id=Vc_Category_Query(interaction.guild.id)
+        vc_category_id,error_message=Vc_Category_Query(interaction.guild.id)
         if vc_category_id!=0:
             vc_category=interaction.guild.get_channel(vc_category_id).mention
         else:
@@ -94,7 +94,7 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
-        member_role_id=Member_Role_Query(interaction.guild.id)
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
         if member_role_id!=0:
             member_role=interaction.guild.get_role(member_role_id).mention
         else:

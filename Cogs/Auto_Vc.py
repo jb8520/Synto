@@ -73,7 +73,7 @@ class Auto_Vc_Buttons(discord.ui.View):
             auto_vc_owners=[]
         position=auto_vc_owners.index(interaction.user.id)
         channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id=Member_Role_Query(interaction.guild.id)
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
         try:
             member_role=interaction.guild.get_role(member_role_id)
         except AttributeError:
@@ -97,7 +97,7 @@ class Auto_Vc_Buttons(discord.ui.View):
             auto_vc_owners=[]
         position=auto_vc_owners.index(interaction.user.id)
         channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id=Member_Role_Query(interaction.guild.id)
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
         try:
             member_role=interaction.guild.get_role(member_role_id)
         except AttributeError:
@@ -121,7 +121,7 @@ class Auto_Vc_Buttons(discord.ui.View):
             auto_vc_owners=[]
         position=auto_vc_owners.index(interaction.user.id)
         channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id=Member_Role_Query(interaction.guild.id)
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
         try:
             member_role=interaction.guild.get_role(member_role_id)
         except AttributeError:
@@ -145,7 +145,7 @@ class Auto_Vc_Buttons(discord.ui.View):
             auto_vc_owners=[]
         position=auto_vc_owners.index(interaction.user.id)
         channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id=Member_Role_Query(interaction.guild.id)
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
         try:
             member_role=interaction.guild.get_role(member_role_id)
         except AttributeError:
