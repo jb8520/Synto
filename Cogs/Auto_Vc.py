@@ -232,14 +232,6 @@ class Auto_Vc(commands.Cog):
         vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list=Query(member.guild.id)
         if vc_creator_id==0:
             return
-        try:
-            auto_vcs:list=self.auto_vcs[member.guild.id]
-            auto_vc_owners:list=self.auto_vc_owners[member.guild.id]
-            auto_vc_number_names:list=self.auto_vc_number_names[member.guild.id]
-        except KeyError:
-            auto_vcs=[]
-            auto_vc_owners=[]
-            auto_vc_number_names=[]
         vc_creator=self.bot.get_channel(vc_creator_id)
         if before.channel!=after.channel and after.channel==vc_creator:
             overwrites={
@@ -253,41 +245,42 @@ class Auto_Vc(commands.Cog):
                 number=1
             else:
                 number=0
-                highest_current_number=max(auto_vc_number_names)
+                highest_current_number=max(self.auto_vc_number_names[member.guild.id])
                 for i in range(highest_current_number):
-                    if i+1 not in auto_vc_number_names:
+                    if i+1 not in self.auto_vc_number_names[member.guild.id]:
                         number=i+1
                         break
                 if number==0:
-                    number=len(auto_vcs)+1
-            channel=await member.guild.create_voice_channel(f'VC {number}',category=self.bot.get_channel(vc_category_id),overwrites=overwrites)
+                    number=len(self.auto_vcs[member.guild.id])+1
+            channel=await member.guild.create_voice_channel(f"VC {number}",category=self.bot.get_channel(vc_category_id),overwrites=overwrites)
             await member.move_to(channel)
-            auto_vcs.append(channel.id)
-            auto_vc_owners.append(member.id)
-            auto_vc_number_names.append(number)
-        if member.guild.id in self.Auto_Vcs:
-            for channel_id in auto_vcs:
+            if member.guild.id in self.auto_vcs:
+                self.auto_vcs[member.guild.id].append(channel.id)
+                self.auto_vc_owners[member.guild.id].append(member.id)
+                self.auto_vc_number_names[member.guild.id].append(number)
+            else:
+                self.auto_vcs[member.guild.id]=[channel.id]
+                self.auto_vc_owners[member.guild.id]=[member.id]
+                self.auto_vc_number_names[member.guild.id]=[number]
+        if member.guild.id in self.auto_vcs:
+            for channel_id in self.auto_vcs[member.guild.id]:
                 channel=member.guild.get_channel(channel_id)
                 if before.channel!=after.channel and before.channel==channel and before.channel.members==[]:
-                    position=auto_vcs.index(channel_id)
-                    auto_vcs.pop(position)
-                    auto_vc_owners.pop(position)
-                    auto_vc_number_names.pop(position)
-                    await channel.delete()
-                    if auto_vcs==[]:
+                    position=self.auto_vcs[member.guild.id].index(channel_id)
+                    self.auto_vcs[member.guild.id].pop(position)
+                    self.auto_vc_owners[member.guild.id].pop(position)
+                    self.auto_vc_number_names[member.guild.id].pop(position)
+                    if self.auto_vcs[member.guild.id]==[]:
                         del self.auto_vcs[member.guild.id]
                         del self.auto_vc_owners[member.guild.id]
                         del self.auto_vc_number_names[member.guild.id]
-                        return
-                    break
-                elif before.channel!=after.channel and before.channel==channel and member.id in auto_vc_owners:
-                    position=auto_vc_owners.index(member.id)
-                    auto_vc_owners[position]=0
-                    break
-        self.auto_vcs[member.guild.id]=auto_vcs
-        self.auto_vc_owners[member.guild.id]=auto_vc_owners
-        self.auto_vc_number_names[member.guild.id]=auto_vc_number_names
-
+                    await channel.delete()
+                    return
+                elif before.channel!=after.channel and before.channel==channel and member.id in self.auto_vc_owners[member.guild.id]:
+                    position=self.auto_vc_owners[member.guild.id].index(member.id)
+                    self.auto_vc_owners[member.guild.id][position]=0
+                    return
+                
 
 async def setup(bot:commands.Bot):
     await bot.add_cog(Auto_Vc(bot))
