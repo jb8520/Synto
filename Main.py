@@ -94,32 +94,5 @@ async def sync(ctx:commands.Context):
     await bot.tree.sync()
     print('Synced Commands to the Tree')
 
-@bot.event()
-async def on_command_error(ctx:commands.Context,error:commands.CommandError):
-    
-    Error=getattr(error,'original',error)
-    
-    ignored_errors=(commands.CommandNotFound,)
-
-    if isinstance(Error,ignored_errors):
-        return
-    
-    error_channel=bot.get_guild(os.environ['SUPPORT_SERVER_ID']).get_channel(os.environ['ERROR_LOG_ID'])
-    
-    Embed=discord.Embed(title='Prefix Command Error',colour=0xff0000)
-    
-    if isinstance(Error,commands.BadArgument):
-        Embed.add_field(name='Error Type:',value='> BadArgument')
-        print(type(error))
-        print(error)
-        try:
-            print(error.args)
-            print(error[0])
-        except:
-            print('error')
-        await error_channel.send(embed=Embed) 
-    else:
-        traceback.print_exc(error)
-
 
 bot.run(os.environ['BOT_TOKEN'])

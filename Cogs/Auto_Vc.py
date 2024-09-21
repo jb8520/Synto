@@ -253,7 +253,7 @@ class Auto_Vc(commands.Cog):
                 number=1
             else:
                 number=0
-                highest_current_number=max(auto_vcs)
+                highest_current_number=max(auto_vc_number_names)
                 for i in range(highest_current_number):
                     if i+1 not in auto_vc_number_names:
                         number=i+1
@@ -265,7 +265,7 @@ class Auto_Vc(commands.Cog):
             auto_vcs.append(channel.id)
             auto_vc_owners.append(member.id)
             auto_vc_number_names.append(number)
-        else:
+        if member.guild.id in self.Auto_Vcs:
             for channel_id in auto_vcs:
                 channel=member.guild.get_channel(channel_id)
                 if before.channel!=after.channel and before.channel==channel and before.channel.members==[]:
