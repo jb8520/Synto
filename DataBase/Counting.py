@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def DataBase_Connection():
-    return mysql.connector.connect(host=os.environ["DATABASE_HOST"],user=os.environ["DATABASE_USER"],password=os.environ["DATABASE_PASSWORD"],database=os.environ["DATABASE_NAME"])
+    return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
 
 
 def Counting_Channel_Query(guild_id):
@@ -27,7 +27,7 @@ def Counting_Channel_Query(guild_id):
 def Double_Count_Query(guild_id):
     connection=DataBase_Connection()
     cursor=connection.cursor()
-    cursor.execute(f"SELECT double_count FROM Auto_Vc WHERE guild_id='{guild_id}'")
+    cursor.execute(f"SELECT double_count FROM Counting WHERE guild_id='{guild_id}'")
     fetch=cursor.fetchone()
     connection.close()
     if fetch is None:
@@ -35,11 +35,9 @@ def Double_Count_Query(guild_id):
         fetch=['False']
     connection.close()
     cursor.close()
-    vc_creator_id=bool(fetch[0])
-    if vc_creator_id==0:
-        return vc_creator_id,'❌ Double count is not set to a correct option'
-    else:
-        return vc_creator_id,'✅ Success!'
+    fetch=fetch[0]
+    double_count=True if fetch=='True' else False
+    return double_count,'✅ Success!'
 
 
 
@@ -67,6 +65,7 @@ def Query(guild_id):
         Add_Server(guild_id,connection,cursor)
         fetch=(guild_id,0,0,0,0,0,False)
     guild_id,channel_id,highscore,current_score,message_id,author_id,double_count=fetch
+    guild_id=int(guild_id)
     channel_id=int(channel_id)
     highscore=int(highscore)
     current_score=int(current_score)
@@ -131,13 +130,13 @@ def Query(Guild_id,Query):
         Configure(Guild_id,Configure=True)
         Cursor.execute(f"SELECT {Query} FROM Counting WHERE guild_id='{Guild_id}'")
         Fetch=Cursor.fetchone()
-    if Query!="double_count":
+    if Query!='double_count':
         Fetch=int(Fetch[0])
         return Fetch
     else:
-        if Fetch[0]=="True":
+        if Fetch[0]=='True':
             return True
-        elif Fetch[0]=="False":
+        elif Fetch[0]=='False':
             return False
 def Configure(Guild_id,Channel_id=None,Double_Count=None,Configure=False):
     Connection=DataBase_Connection()

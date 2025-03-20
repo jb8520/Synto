@@ -4,46 +4,91 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def DataBase_Connection():
-    return mysql.connector.connect(host=os.environ["DATABASE_HOST"],user=os.environ["DATABASE_USER"],password=os.environ["DATABASE_PASSWORD"],database=os.environ["DATABASE_NAME"])
+    return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
 
-def Query(Guild_id,Query):
-    Connection=DataBase_Connection()
-    Cursor=Connection.cursor()
-    Cursor.execute(f"SELECT {Query} FROM Welcome_Message WHERE guild_id='{Guild_id}'")
-    Fetch=(Cursor.fetchone())[0]
-    if Query=="activated":
-        Fetch=True if Fetch=="True" else False
-    elif Query=="guild_id" or Query=="channel_id":
-        Fetch=int(Fetch)
-    Connection.commit()
-    Connection.close()
-    return Fetch
 
-def Configure(Guild_id,Channel_id=None,Title=None,Description=None,Colour=None,Activated=None):
-    Connection=DataBase_Connection()
-    Cursor=Connection.cursor()
-    Cursor.execute(f"SELECT guild_id FROM Welcome_Message WHERE guild_id='{Guild_id}'")
-    Fetch=Cursor.fetchone()
+def Welcome_Channel_Query(guild_id):
+    connection=DataBase_Connection()
+    cursor=connection.cursor()
+    cursor.execute(f"SELECT channel_id FROM Welcome_Message WHERE guild_id='{guild_id}'")
+    fetch=cursor.fetchone()
+    connection.close()
+    if fetch is None:
+        Add_Server(guild_id,connection,cursor)
+        fetch=[0]
+    connection.close()
+    cursor.close()
+    welcome_channel_id=int(fetch[0])
+    if welcome_channel_id==0:
+        return welcome_channel_id,'❌ The welcome channel is not set to a valid channel'
+    else:
+        return welcome_channel_id,'✅ Success!'
+
+def Activated_Query(guild_id):
+    connection=DataBase_Connection()
+    cursor=connection.cursor()
+    cursor.execute(f"SELECT activated FROM Welcome_Message WHERE guild_id='{guild_id}'")
+    fetch=cursor.fetchone()
+    connection.close()
+    if fetch is None:
+        Add_Server(guild_id,connection,cursor)
+        fetch=['False']
+    connection.close()
+    cursor.close()
+    fetch=fetch[0]
+    activated=True if fetch=='True' else False
+    return activated,'✅ Success!'
+
+def Add_Server(guild_id,connection=DataBase_Connection(),cursor=None):
+    if cursor is None:
+        cursor=connection.cursor()
+    cursor.execute(f"INSERT INTO Welcome_Message (guild_id, channel_id, title, description, colour, activated) VALUES ('{guild_id}', '0', 'Welcome!','None','None','False')")
+    connection.commit()
+
+def Remove(guild_id):
+    connection=DataBase_Connection()
+    cursor=connection.cursor()
+    cursor.execute(f"DELETE FROM Welcome_Message WHERE guild_id='{guild_id}'")
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+
+def Query(guild_id):
+    connection=DataBase_Connection()
+    cursor=connection.cursor()
+    cursor.execute(f"SELECT * FROM Welcome_Message WHERE guild_id='{guild_id}'")
+    fetch=cursor.fetchone()
+    if fetch is None:
+        Add_Server(guild_id,connection,cursor)
+        fetch=(guild_id,0,'Welcome!','None','None',False)
+    guild_id,channel_id,title,description,colour,activated=fetch
+    guild_id=int(guild_id)
+    channel_id=int(channel_id)
+    title=str(title)
+    description=str(description)
+    colour=str(colour)
+    activated=True if activated=='True' else False
+    return channel_id,title,description,colour,activated
+
+def Configure(guild_id,channel_id=None,title=None,description=None,colour=None,activated=None):
+    connection=DataBase_Connection()
+    cursor=connection.cursor()
+    cursor.execute(f"SELECT guild_id FROM Welcome_Message WHERE guild_id='{guild_id}'")
+    Fetch=cursor.fetchone()
     if Fetch is None:
-        Cursor.execute(f"INSERT INTO Welcome_Message(guild_id, channel_id, title, description, colour, activated) VALUES ('{Guild_id}', '0', 'Welcome!','None','None','False')")
-        Connection.commit()
-    if Channel_id is not None:
-        Cursor.execute(f"UPDATE Welcome_Message SET channel_id='{Channel_id}' WHERE guild_id='{Guild_id}'")
-    if Title is not None:
-        Cursor.execute(f"UPDATE Welcome_Message SET title='{Title}' WHERE guild_id='{Guild_id}'")
-    if Description is not None:
-        Cursor.execute(f"UPDATE Welcome_Message SET description='{Description}' WHERE guild_id='{Guild_id}'")
-    if Colour is not None:
-        Cursor.execute(f"UPDATE Welcome_Message SET colour='{Colour}' WHERE guild_id='{Guild_id}'")
-    if Activated is not None:
-        Cursor.execute(f"UPDATE Welcome_Message SET activated='{Activated}' WHERE guild_id='{Guild_id}'")
-    Connection.commit()
-    Cursor.close()
-    Connection.close()
-def Remove(Guild_id):
-    Connection=DataBase_Connection()
-    Cursor=Connection.cursor()
-    Cursor.execute(f"DELETE FROM Welcome_Message WHERE guild_id='{Guild_id}'")
-    Connection.commit()
-    Cursor.close()
-    Connection.close()
+        cursor.execute(f"INSERT INTO Welcome_Message(guild_id, channel_id, title, description, colour, activated) VALUES ('{guild_id}', '0', 'Welcome!','None','None','False')")
+        connection.commit()
+    if channel_id is not None:
+        cursor.execute(f"UPDATE Welcome_Message SET channel_id='{channel_id}' WHERE guild_id='{guild_id}'")
+    if title is not None:
+        cursor.execute(f"UPDATE Welcome_Message SET title='{title}' WHERE guild_id='{guild_id}'")
+    if description is not None:
+        cursor.execute(f"UPDATE Welcome_Message SET description='{description}' WHERE guild_id='{guild_id}'")
+    if colour is not None:
+        cursor.execute(f"UPDATE Welcome_Message SET colour='{colour}' WHERE guild_id='{guild_id}'")
+    if activated is not None:
+        cursor.execute(f"UPDATE Welcome_Message SET activated='{activated}' WHERE guild_id='{guild_id}'")
+    connection.commit()
+    cursor.close()
+    connection.close()

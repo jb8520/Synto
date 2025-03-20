@@ -7,10 +7,10 @@ import os, datetime, random
 import Checks
 
 from Cogs.Auto_Vc import Auto_Vc_Buttons
-from DataBase.Welcome_Message import Query as Welcome_Message_Query
+from DataBase.Welcome_Message import Query as Welcome_Message_Query, Configure as Welcome_Message_Configure
 from DataBase.Auto_Vc import Remove as Auto_Vc_Remove_Server
 from DataBase.Counting import Remove as Counting_Remove_Server
-from DataBase.Welcome_Message import Configure as Welcome_Message_Configure, Remove as Welcome_Message_Remove_Server
+from DataBase.Welcome_Message import Remove as Welcome_Message_Remove_Server
 
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):
@@ -20,23 +20,21 @@ class Other(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self,member):
         Welcome_Message_Configure(member.guild.id)
-        activated=Welcome_Message_Query(member.guild.id,'activated')
+        channel_id,title,description,colour,activated=Welcome_Message_Query(member.guild.id)
         if activated:
-            welcome_channel=self.bot.get_channel(Welcome_Message_Query(member.guild.id,'channel_id'))
+            welcome_channel=self.bot.get_channel(channel_id)
             if welcome_channel==None:
                 return
-            title=Welcome_Message_Query(member.guild.id,'title')
-            description=Welcome_Message_Query(member.guild.id,'description')
             if description=='None':
                 description=None
             elif 'member.mention' in description:
                 position=description.index('member.mention')
                 description=f'{description[:position]}{member.mention}{description[position+14:]}'
-            colour=Welcome_Message_Query(member.guild.id,'colour')
             if colour=='None':
                 colour='000000'
             elif colour[:1]=='#':
                 colour=colour[1:]
+                #change to welcome message update
                 Welcome_Message_Configure(member.guild.id,Colour=colour)
             try:
                 colour=discord.Colour.from_str('#'+colour)

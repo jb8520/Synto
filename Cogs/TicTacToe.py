@@ -1,4 +1,4 @@
-import discord, 
+import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -10,9 +10,9 @@ class TicTacToe_Cog(commands.Cog):
         self.bot=bot
     
     class TicTacToe(discord.ui.View):
-        class TicTacToeButton(discord.ui.Button["discord.ui.View.TicTacToe"]):
+        class TicTacToeButton(discord.ui.Button['discord.ui.View.TicTacToe']):
             def __init__(self,x:int,y:int):
-                super().__init__(style=discord.ButtonStyle.grey,label="\u200b",row=y)
+                super().__init__(style=discord.ButtonStyle.grey,label='\u200b',row=y)
                 self.x=x
                 self.y=y
             
@@ -22,12 +22,12 @@ class TicTacToe_Cog(commands.Cog):
                     view.player_1=view.current_player=interaction.user.id
                 elif view.current_player==view.player_2==0:
                     if interaction.user.id==view.player_1:
-                        await interaction.response.send_message(f"❌ {interaction.user.mention} you can not play against yourself.",ephemeral=True)
+                        await interaction.response.send_message(f'❌ {interaction.user.mention} you can not play against yourself.',ephemeral=True)
                         return
                     view.player_2=view.current_player=interaction.user.id
                 if view.current_player==view.player_1==interaction.user.id:
                     self.style=discord.ButtonStyle.red
-                    self.label="X"
+                    self.label='X'
                     self.disabled=True
                     view.board[self.y][self.x]=1
                     view.current_player=view.player_2
@@ -37,24 +37,24 @@ class TicTacToe_Cog(commands.Cog):
                         content=f"It is now {interaction.guild.get_member(view.player_2).mention}'s turn."
                 elif view.current_player==view.player_2==interaction.user.id:
                     self.style=discord.ButtonStyle.green
-                    self.label="O"
+                    self.label='O'
                     self.disabled=True
                     view.board[self.y][self.x]=-1
                     view.current_player=view.player_1
                     content=f"It is now {interaction.guild.get_member(view.player_1).mention}'s turn."
                 else:
                     if view.current_player==view.player_1 and view.player_2==interaction.user.id or view.current_player==view.player_2 and view.player_1==interaction.user.id:
-                        message="❌ it is not your turn." 
+                        message='❌ it is not your turn.' 
                     else:
-                        message="❌ this is not your game." 
-                    await interaction.response.send_message(f"{interaction.user.mention} {message}",ephemeral=True)
+                        message='❌ this is not your game.' 
+                    await interaction.response.send_message(f'{interaction.user.mention} {message}',ephemeral=True)
                     return
                 winner=view.Winner_Check(view.player_1,view.player_2)
                 if winner is not None:
                     if winner==view.player_1:
-                        content=f"{interaction.guild.get_member(view.player_1).mention} won!"
+                        content=f'{interaction.guild.get_member(view.player_1).mention} won!'
                     elif winner==view.player_2:
-                        content=f"{interaction.guild.get_member(view.player_2).mention} won!"
+                        content=f'{interaction.guild.get_member(view.player_2).mention} won!'
                     else:
                         content="It's a tie!"
                     for child in view.children:
@@ -101,7 +101,7 @@ class TicTacToe_Cog(commands.Cog):
     
     @app_commands.command()
     async def tictactoe(self,interaction:discord.Interaction):
-        await interaction.response.send_message("Tic Tac Toe: X goes first",view=self.TicTacToe())
+        await interaction.response.send_message('Tic Tac Toe: X goes first',view=self.TicTacToe())
 
 
 async def setup(bot:commands.bot):

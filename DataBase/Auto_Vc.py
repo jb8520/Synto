@@ -5,7 +5,7 @@ load_dotenv()
 
 
 def DataBase_Connection():
-    return mysql.connector.connect(host=os.environ["DATABASE_HOST"],user=os.environ["DATABASE_USER"],password=os.environ["DATABASE_PASSWORD"],database=os.environ["DATABASE_NAME"])
+    return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
 
 
 def Vc_Creator_Query(guild_id):
@@ -74,7 +74,7 @@ def Moderator_Roles_Query(guild_id):
     moderator_roles_ids_list=[]
     if moderator_roles_ids_str[-1]==',':
         moderator_roles_ids_str=moderator_roles_ids_str[:-1]
-    moderator_roles_ids=moderator_roles_ids_str.split(",")
+    moderator_roles_ids=moderator_roles_ids_str.split(',')
     for id in moderator_roles_ids:
         moderator_roles_ids_list.append(int(id))
     return moderator_roles_ids_list
@@ -110,7 +110,7 @@ def Query(guild_id):
     moderator_roles_ids_list=[]
     if moderator_roles_ids_str[-1]==',':
         moderator_roles_ids_str=moderator_roles_ids_str[:-1]
-    moderator_roles_ids=moderator_roles_ids_str.split(",")
+    moderator_roles_ids=moderator_roles_ids_str.split(',')
     for id in moderator_roles_ids:
         moderator_roles_ids_list.append(int(id))
     return vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list
@@ -134,9 +134,9 @@ def Configure(guild_id,vc_creator_id=None,vc_category_id=None,member_role_id=Non
         cursor.execute(f"UPDATE Auto_Vc SET member_role='{member_role_id}' WHERE guild_id='{guild_id}'")
         updated=True
     if moderator_roles_ids_list is not None:
-        ids_string=""
+        ids_string=''
         for id in moderator_roles_ids_list:
-            ids_string+=f"{id},"
+            ids_string+=f'{id},'
         cursor.execute(f"UPDATE Auto_Vc SET bypass_roles='{ids_string}' WHERE guild_id='{guild_id}'")
         updated=True
     if updated:
