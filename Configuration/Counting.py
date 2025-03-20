@@ -78,7 +78,7 @@ class Counting_Channel_Select(discord.ui.ChannelSelect):
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
-        Configure(interaction.guild_id,Channel_id=self.values[0].id)
+        Configure(interaction.guild_id,channel_id=self.values[0].id)
         await interaction.response.edit_message(embed=discord.Embed(description=f'Successfully set the counting channel to {self.values[0].mention}',colour=0x00F3FF),view=None)
         self.view_self.stop()
 class Counting_Double_Count_View(discord.ui.View):
@@ -92,7 +92,7 @@ class Counting_Double_Count_View(discord.ui.View):
             return
         view=None
         await interaction.response.edit_message(embed=discord.Embed(description='Double Count set to True',colour=0x00F3FF),view=view)
-        Configure(interaction.guild_id,Double_Count=True)
+        Configure(interaction.guild_id,double_count=True)
         self.stop()
     @discord.ui.button(emoji='❌',label='False',style=discord.ButtonStyle.grey,custom_id='double_count_false')
     async def false(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -102,5 +102,5 @@ class Counting_Double_Count_View(discord.ui.View):
             return
         view=None
         await interaction.response.edit_message(embed=discord.Embed(description='Double Count set to False',colour=0x00F3FF),view=view)
-        Configure(interaction.guild_id,Double_Count=False)
+        Configure(interaction.guild_id,double_count=False)
         self.stop()

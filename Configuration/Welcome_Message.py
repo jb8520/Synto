@@ -127,57 +127,57 @@ class Welcome_Channel_Select(discord.ui.ChannelSelect):
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
-        Configure(interaction.guild_id,Channel_id=self.values[0].id)
+        Configure(interaction.guild_id,channel_id=self.values[0].id)
         await interaction.response.edit_message(embed=discord.Embed(description=f'Successfully set the welcome channel to {self.values[0].mention}',colour=0x00F3FF),view=None)
         self.View_Self.stop()
 
 class Welcome_Message_Title_Modal(discord.ui.Modal,title='Welcome Message Title'):
-    Title=discord.ui.TextInput(label='Enter your new welcome message title',style=discord.TextStyle.short,required=True)
+    title=discord.ui.TextInput(label='Enter your new welcome message title',style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             self.stop()
             return
-        await interaction.response.send_message(embed=discord.Embed(description='The welcome message title has been updated:\n'+str(self.Title),colour=0x00F3FF),ephemeral=True)
-        Configure(interaction.guild_id,Title=self.Title)
+        await interaction.response.send_message(embed=discord.Embed(description='The welcome message title has been updated:\n'+str(self.title),colour=0x00F3FF),ephemeral=True)
+        Configure(interaction.guild_id,title=self.title)
         self.stop()
 
 class Welcome_Message_Description_Modal(discord.ui.Modal,title='Welcome Message Description'):
-    Description=discord.ui.TextInput(label='Enter your new welcome message description',placeholder='Enter None to remove the description',style=discord.TextStyle.long,required=True)
+    description=discord.ui.TextInput(label='Enter your new welcome message description',placeholder='Enter None to remove the description',style=discord.TextStyle.long,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             self.stop()
             return
-        await interaction.response.send_message(embed=discord.Embed(description='The welcome message description has been updated to:\n'+str(self.Description),colour=0x00F3FF),ephemeral=True)
-        if str(self.Description).lower()=='none':
-            self.Description='None'
-        Configure(interaction.guild_id,Description=self.Description)
+        await interaction.response.send_message(embed=discord.Embed(description='The welcome message description has been updated to:\n'+str(self.description),colour=0x00F3FF),ephemeral=True)
+        if str(self.description).lower()=='none':
+            self.description='None'
+        Configure(interaction.guild_id,description=self.description)
         self.stop()
 
 class Welcome_Message_Colour_Modal(discord.ui.Modal,title='Welcome Message Colour'):
-    Colour=discord.ui.TextInput(label='Enter your new welcome message colour',placeholder='Enter None to remove the colour',style=discord.TextStyle.short,required=True)
+    colour=discord.ui.TextInput(label='Enter your new welcome message colour',placeholder='Enter None to remove the colour',style=discord.TextStyle.short,required=True)
     async def on_submit(self,interaction:discord.Interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
             await interaction.response.send_message(error_message,ephemeral=True)
             self.stop()
             return
-        Colour=str(self.Colour)
-        if Colour[:1]=='#':
-            Colour=Colour[1:]
+        colour=str(self.colour)
+        if colour[:1]=='#':
+            colour=colour[1:]
         try:
-            if Colour.lower()=='none':
-                Colour='None'
+            if colour.lower()=='none':
+                colour='None'
             else:
-                discord.Colour.from_str('#'+Colour)
+                discord.Colour.from_str('#'+colour)
         except:
-            await interaction.response.send_message(f'❌ The inputted colour ({self.Colour}) is not in the accepted form (the 6 digit part of a colour hex code). The welcome message colour is unchanged.',ephemeral=True)
+            await interaction.response.send_message(f'❌ The inputted colour ({self.colour}) is not in the accepted form (the 6 digit part of a colour hex code). The welcome message colour is unchanged.',ephemeral=True)
         else:
-            await interaction.response.send_message(embed=discord.Embed(description=f'The welcome message colour has been updated to:\n{Colour}',colour=0x00F3FF),ephemeral=True)
-            Configure(interaction.guild_id,Colour=Colour)
+            await interaction.response.send_message(embed=discord.Embed(description=f'The welcome message colour has been updated to:\n{colour}',colour=0x00F3FF),ephemeral=True)
+            Configure(interaction.guild_id,colour=colour)
         finally:
             self.stop()                
 
@@ -192,7 +192,7 @@ class Welcome_Message_Activated_View(discord.ui.View):
             return
         View=None
         await interaction.response.edit_message(embed=discord.Embed(description='The welcome message functionality has been turned on',colour=0x00F3FF),view=View)
-        Configure(interaction.guild_id,Activated=True)
+        Configure(interaction.guild_id,activated=True)
         self.stop()
     @discord.ui.button(emoji='❌',label='Off',style=discord.ButtonStyle.grey,custom_id='welcome_channel_false')
     async def false(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -202,5 +202,5 @@ class Welcome_Message_Activated_View(discord.ui.View):
             return
         View=None
         await interaction.response.edit_message(embed=discord.Embed(description='The welcome message functionality has been turned off',colour=0x00F3FF),view=View)
-        Configure(interaction.guild_id,Activated=False)
+        Configure(interaction.guild_id,activated=False)
         self.stop()
