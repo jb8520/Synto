@@ -8,9 +8,9 @@ import Checks
 
 from Cogs.Auto_Vc import Auto_Vc_Buttons
 from DataBase.Welcome_Message import Query as Welcome_Message_Query, Configure as Welcome_Message_Configure
-from DataBase.Auto_Vc import Remove as Auto_Vc_Remove_Server
-from DataBase.Counting import Remove as Counting_Remove_Server
-from DataBase.Welcome_Message import Remove as Welcome_Message_Remove_Server
+from DataBase.Auto_Vc import Remove_Server as Auto_Vc_Remove_Server
+from DataBase.Counting import Remove_Server as Counting_Remove_Server
+from DataBase.Welcome_Message import Remove_Server as Welcome_Message_Remove_Server
 
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):

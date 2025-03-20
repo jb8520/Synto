@@ -13,9 +13,13 @@ class Counting_Menu_View(discord.ui.View):
         Embed=discord.Embed(title='**Counting Settings ⚙️**',colour=0x00F3FF)
         channel_id,double_count=Query(interaction.guild.id)
         if channel_id==0:
-            Embed.add_field(name='Counting Channel',value=f'> #channel',inline=False)
+            channel='#channel'
         else:
-            Embed.add_field(name='Counting Channel',value=f'> {interaction.guild.get_channel(channel_id).mention}',inline=False)
+            try:
+                channel=interaction.guild.get_channel(channel_id).mention
+            except:
+                channel='#channel'
+        Embed.add_field(name='Counting Channel',value=f'> {channel}',inline=False)
         Embed.add_field(name='Double Count',value=f'> {double_count}',inline=False)
         return Embed
     @discord.ui.button(label='Counting Channel',style=discord.ButtonStyle.grey,row=0,custom_id='counting_channel')

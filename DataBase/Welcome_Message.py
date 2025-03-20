@@ -45,7 +45,7 @@ def Add_Server(guild_id,connection=DataBase_Connection(),cursor=None):
     cursor.execute(f"INSERT INTO Welcome_Message (guild_id, channel_id, title, description, colour, activated) VALUES ('{guild_id}', '0', 'Welcome!','None','None','False')")
     connection.commit()
 
-def Remove(guild_id):
+def Remove_Server(guild_id):
     connection=DataBase_Connection()
     cursor=connection.cursor()
     cursor.execute(f"DELETE FROM Welcome_Message WHERE guild_id='{guild_id}'")
@@ -77,18 +77,24 @@ def Configure(guild_id,channel_id=None,title=None,description=None,colour=None,a
     cursor.execute(f"SELECT guild_id FROM Welcome_Message WHERE guild_id='{guild_id}'")
     Fetch=cursor.fetchone()
     if Fetch is None:
-        cursor.execute(f"INSERT INTO Welcome_Message(guild_id, channel_id, title, description, colour, activated) VALUES ('{guild_id}', '0', 'Welcome!','None','None','False')")
-        connection.commit()
+        Add_Server(guild_id,connection,cursor)
+    updated=False
     if channel_id is not None:
         cursor.execute(f"UPDATE Welcome_Message SET channel_id='{channel_id}' WHERE guild_id='{guild_id}'")
+        updated=True
     if title is not None:
         cursor.execute(f"UPDATE Welcome_Message SET title='{title}' WHERE guild_id='{guild_id}'")
+        updated=True
     if description is not None:
         cursor.execute(f"UPDATE Welcome_Message SET description='{description}' WHERE guild_id='{guild_id}'")
+        updated=True
     if colour is not None:
         cursor.execute(f"UPDATE Welcome_Message SET colour='{colour}' WHERE guild_id='{guild_id}'")
+        updated=True
     if activated is not None:
         cursor.execute(f"UPDATE Welcome_Message SET activated='{activated}' WHERE guild_id='{guild_id}'")
-    connection.commit()
+        updated=True
+    if updated:
+        connection.commit()
     cursor.close()
     connection.close()

@@ -13,19 +13,25 @@ class Welcome_Message_Menu_View(discord.ui.View):
         Embed=discord.Embed(title='Welcome Message Settings ⚙️',colour=0x00F3FF)
         channel_id,title,description,colour,activated=Query(interaction.guild.id)
         if channel_id==0:
-            Embed.add_field(name='Welcome Channel',value=f'> #channel',inline=False)
+            channel='#channel'
         else:
-            Embed.add_field(name='Counting Channel',value=f'> {interaction.guild.get_channel(channel_id).mention}',inline=False)
+            try:
+                channel=interaction.guild.get_channel(channel_id).mention
+            except:
+                channel='#channel'
+        Embed.add_field(name='Welcome Channel',value=f'> {channel}',inline=False)
         Embed.add_field(name='Title',value=f'> {title}',inline=False)
         if description is None:
-            Embed.add_field(name='Description',value='> None',inline=False)
-        else:
-            Embed.add_field(name='Description',value=f'> {description}',inline=False)
+            description='None'
+        Embed.add_field(name='Description',value=f'> {description}',inline=False)
         if colour is None:
-            Embed.add_field(name='Colour',value='> None',inline=False)
+            colour='None'
+        Embed.add_field(name='Colour',value=f'> #{colour}',inline=False)
+        if activated:
+            activated='On'
         else:
-            Embed.add_field(name='Colour',value=f'> #{colour}',inline=False)
-        Embed.add_field(name='Activated',value=f'> {activated}',inline=False)
+            activated='Off'
+            Embed.add_field(name='Activated',value=f'> {activated}',inline=False)
         return Embed
     @discord.ui.button(label='Welcome Channel',style=discord.ButtonStyle.grey,row=0,custom_id='welcome_channel')
     async def welcome_channel(self,interaction:discord.Interaction,button:discord.ui.Button):

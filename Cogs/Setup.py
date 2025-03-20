@@ -37,67 +37,81 @@ class Select_Menu(discord.ui.Select):
             Embed=discord.Embed(title='**Counting Settings ⚙️**',colour=0x00F3FF)
             channel_id,highscore,current_score,message_id,author_id,double_count=Counting_Query(interaction.guild.id)
             if channel_id==0:
-                Embed.add_field(name='Counting Channel',value=f'> #channel',inline=False)
+                channel='#channel'
             else:
-                Embed.add_field(name='Counting Channel',value=f'> {interaction.guild.get_channel(channel_id).mention}',inline=False)
+                try:
+                    channel=interaction.guild.get_channel(channel_id).mention
+                except:
+                    channel='#channel'
+            Embed.add_field(name='Counting Channel',value=f'> {channel}',inline=False)
             Embed.add_field(name='Double Count',value=f'> {double_count}',inline=False)
-            View=Counting_Menu_View()
-            await interaction.response.edit_message(content=None,embed=Embed,view=View)
+            view=Counting_Menu_View()
+            await interaction.response.edit_message(content=None,embed=Embed,view=view)
         elif Choice=='Auto Vcs':
             Embed=discord.Embed(title='Auto Voice Channel Settings ⚙️',colour=0x00F3FF)
             vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list=Auto_Vc_Query(interaction.guild.id)
             if vc_creator_id==0:
-                Embed.add_field(name='Auto Vc Creator',value=f'> #channel',inline=False)
+                vc_creator='#channel'
             else:
-                Embed.add_field(name='Auto Vc Creator',value=f'> {interaction.guild.get_channel(vc_creator_id).mention}',inline=False)
+                try:
+                    vc_creator=interaction.guild.get_channel(vc_creator_id).mention
+                except:
+                    vc_creator='#channel'
+            Embed.add_field(name='Auto Vc Creator',value=f'> {vc_creator}',inline=False)
             if moderator_roles_ids_list==0:
-                Embed.add_field(name='Moderator Roles',value=f'> @moderator roles',inline=False)
+                roles='@moderator roles'
             else:
-                Roles=''
-                for Role_id in moderator_roles_ids_list:
-                    Roles+=f'{interaction.guild.get_role(Role_id).mention}, '
-                Roles=Roles[:-2]
-                Embed.add_field(name='Moderator Roles',value=f'> {Roles}',inline=False)
+                roles=''
+                for role_id in moderator_roles_ids_list:
+                    try:
+                        roles+=f'{interaction.guild.get_role(role_id).mention}, '
+                    except:
+                        roles+=f'<@&{role_id}>, '
+                roles=roles[:-2]
+            Embed.add_field(name='Moderator Roles',value=f'> {roles}',inline=False)
             if vc_category_id==0:
-                Embed.add_field(name='Auto Vc Category',value=f'> #category',inline=False)
+                vc_category='#category'
             else:
-                Embed.add_field(name='Auto Vc Category',value=f'> {interaction.guild.get_channel(vc_category_id).mention}',inline=False)
+                try:
+                    vc_category=interaction.guild.get_channel(vc_category_id).mention
+                except:
+                    vc_category='#category'
+            Embed.add_field(name='Auto Vc Category',value=f'> {vc_category}',inline=False)
             if member_role_id==0:
-                Embed.add_field(name='Member Role',value=f'> @role',inline=False)
+                member_role='@role'
             else:
-                Embed.add_field(name='Member Role',value=f'> {interaction.guild.get_role(member_role_id).mention}',inline=False)
-            View=Auto_Vcs_Menu_View()
-            await interaction.response.edit_message(content=None,embed=Embed,view=View)
+                try:
+                    member_role=interaction.guild.get_role(member_role_id).mention
+                except:
+                    member_role=f'<@&{member_role_id}>'
+            Embed.add_field(name='Member Role',value=f'> {member_role}',inline=False)
+            view=Auto_Vcs_Menu_View()
+            await interaction.response.edit_message(content=None,embed=Embed,view=view)
         elif Choice=='Welcome Message':
-            hdgf #- welcome message db stuff need be updated
             Embed=discord.Embed(title='Welcome Message Settings ⚙️',colour=0x00F3FF)
             channel_id,title,description,colour,activated=Welcome_Message_Query(interaction.guild.id)
-            Welcome_Message_Configure(interaction.guild.id)
-            # Channel_id=Welcome_Message_Query(interaction.guild.id,'channel_id')
-            # Title=Welcome_Message_Query(interaction.guild.id,'title')
-            # Description=Welcome_Message_Query(interaction.guild.id,'description')
-            # Colour=Welcome_Message_Query(interaction.guild.id,'colour')
-            # Activated=Welcome_Message_Query(interaction.guild.id,'activated')
             if channel_id==0:
-                Embed.add_field(name='Welcome Channel',value=f'> #channel',inline=False)
+                channel='#channel'
             else:
-                Embed.add_field(name='Counting Channel',value=f'> {interaction.guild.get_channel(channel_id).mention}',inline=False)
+                try:
+                    channel=interaction.guild.get_channel(channel_id).mention
+                except:
+                    channel='#channel'
+            Embed.add_field(name='Welcome Channel',value=f'> {channel}',inline=False)
             Embed.add_field(name='Title',value=f'> {title}',inline=False)
             if description is None:
-                Embed.add_field(name='Description',value='> None',inline=False)
-            else:
-                Embed.add_field(name='Description',value=f'> {description}',inline=False)
+                description='None'
+            Embed.add_field(name='Description',value=f'> {description}',inline=False)
             if colour is None:
-                Embed.add_field(name='Colour',value='> None',inline=False)
-            else:
-                Embed.add_field(name='Colour',value=f'> #{colour}',inline=False)
+                colour='None'
+            Embed.add_field(name='Colour',value=f'> #{colour}',inline=False)
             if activated:
                 activated='On'
             else:
                 activated='Off'
             Embed.add_field(name='Activated',value=f'> {activated}',inline=False)
-            View=Welcome_Message_Menu_View()
-            await interaction.response.edit_message(content=None,embed=Embed,view=View)
+            view=Welcome_Message_Menu_View()
+            await interaction.response.edit_message(content=None,embed=Embed,view=view)
 
 class Setup(commands.Cog):
     def __init__(self,bot:commands.Bot):
