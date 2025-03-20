@@ -86,10 +86,10 @@ def Add_Server(guild_id,connection=DataBase_Connection(),cursor=None):
     cursor.execute(f"INSERT INTO Auto_Vc (guild_id,vc_creator_id,vc_category_id,member_role,bypass_roles) VALUES ('{guild_id}','0','0','0','0')")
     connection.commit()
 
-def Remove_Server(Guild_id):
+def Remove_Server(guild_id):
     connection=DataBase_Connection()
     cursor=connection.cursor()
-    cursor.execute(f"DELETE FROM Auto_Vc WHERE guild_id='{Guild_id}'")
+    cursor.execute(f"DELETE FROM Auto_Vc WHERE guild_id='{guild_id}'")
     connection.commit()
     cursor.close()
     connection.close()
@@ -123,17 +123,24 @@ def Configure(guild_id,vc_creator_id=None,vc_category_id=None,member_role_id=Non
     Fetch=cursor.fetchone()
     if Fetch is None:
         Add_Server(guild_id,connection,cursor)
+    updated=False
     if vc_creator_id is not None:
         cursor.execute(f"UPDATE Auto_Vc SET vc_creator_id='{vc_creator_id}' WHERE guild_id='{guild_id}'")
+        updated=True
     if vc_category_id is not None:
         cursor.execute(f"UPDATE Auto_Vc SET vc_category_id='{vc_category_id}' WHERE guild_id='{guild_id}'")
+        updated=True
     if member_role_id is not None:
         cursor.execute(f"UPDATE Auto_Vc SET member_role='{member_role_id}' WHERE guild_id='{guild_id}'")
+        updated=True
     if moderator_roles_ids_list is not None:
         ids_string=""
         for id in moderator_roles_ids_list:
             ids_string+=f"{id},"
         cursor.execute(f"UPDATE Auto_Vc SET bypass_roles='{ids_string}' WHERE guild_id='{guild_id}'")
+        updated=True
+    if updated:
+        connection.commit()
     connection.commit()
     cursor.close()
     connection.close()

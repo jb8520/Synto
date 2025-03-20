@@ -44,7 +44,7 @@ class Invite_Select(discord.ui.MentionableSelect):
         self.View_Self=View_Self
         self.channel=channel
     
-    async def callback(self,interaction):
+    async def callback(self,interaction:discord.Interaction):
         overwrites=self.channel.overwrites
         for option in self.values:
             object=interaction.guild.get_role(option.id)
@@ -225,7 +225,7 @@ class Auto_Vc(commands.Cog):
         self.bot=bot
         self.auto_vcs:dict=bot.auto_vcs
         self.auto_vc_owners:dict=bot.auto_vc_owners
-        self.auto_vc_number_names=bot.auto_vc_number_names
+        self.auto_vc_number_names:dict=bot.auto_vc_number_names
     
     @commands.Cog.listener('on_voice_state_update')
     async def voice_update(self,member:discord.Member,before:discord.VoiceState,after:discord.VoiceState):

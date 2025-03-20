@@ -41,6 +41,7 @@ def Add_Welcome_Message_Table():
     Connection.commit()
     Cursor.close()
     Connection.close()
+
 # Add_Auto_Vc_Table()
 # Add_Counting_Table()
 # Add_Economy_Table()

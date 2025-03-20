@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-import os, traceback, datetime
+import os, datetime
 
 import Checks
 

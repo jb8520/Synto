@@ -14,10 +14,6 @@ class Auto_Vcs_Menu_View(discord.ui.View):
         self.add_item(Setup.Select_Menu())
     def Embed(self,interaction):
         Embed=discord.Embed(title="Auto Voice Channel Settings ⚙️",colour=0x00F3FF)
-        # Vc_Creator_id=Query(interaction.guild.id,'vc_creator_id')
-        # Vc_Category_id=Query(interaction.guild.id,'vc_category_id')
-        # Member_Role=Query(interaction.guild.id,'member_role')
-        # Bypass_Roles=Query(interaction.guild.id,'bypass_roles')
         vc_creator_id,vc_category_id,member_role_id,moderator_roles_ids_list=Query(interaction.guild.id)
         if vc_creator_id==0:
             Embed.add_field(name="Auto Vc Creator",value=f"> #channel",inline=False)
@@ -125,9 +121,9 @@ class Vc_Creator_View(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(Vc_Creator_Select(self))
 class Vc_Creator_Select(discord.ui.ChannelSelect):
-    def __init__(self,View_Self):
+    def __init__(self,view_self):
         super().__init__(placeholder="Vc Creator",min_values=1,max_values=1,channel_types=[discord.ChannelType.voice],custom_id="vc_creator_select")
-        self.View_Self=View_Self
+        self.view_self=view_self
     async def callback(self,interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
@@ -137,16 +133,16 @@ class Vc_Creator_Select(discord.ui.ChannelSelect):
         vc_creator_id=vc_creator
         Configure(interaction.guild_id,vc_creator_id=vc_creator_id)
         await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc creator channel to {self.values[0].mention}",colour=0x00F3FF),view=None)
-        self.View_Self.stop()
+        self.view_self.stop()
 
 class Vc_Category_View(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(Vc_Category_Select(self))
 class Vc_Category_Select(discord.ui.ChannelSelect):
-    def __init__(self,View_Self):
+    def __init__(self,view_self):
         super().__init__(placeholder="Auto Vc Category",min_values=1,max_values=1,channel_types=[discord.ChannelType.category],custom_id="vc_category_select")
-        self.View_Self=View_Self
+        self.view_self=view_self
     async def callback(self,interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
@@ -156,16 +152,16 @@ class Vc_Category_Select(discord.ui.ChannelSelect):
         vc_category_id=vc_category.id
         Configure(interaction.guild_id,vc_category_id=vc_category_id)
         await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the auto vc category to {vc_category.mention}",colour=0x00F3FF),view=None)
-        self.View_Self.stop()
+        self.view_self.stop()
 
 class Member_Role_View(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(Member_Role_Select(self))
 class Member_Role_Select(discord.ui.RoleSelect):
-    def __init__(self,View_Self):
+    def __init__(self,view_self):
         super().__init__(placeholder="Member Role",min_values=1,max_values=1,custom_id="member_role_select")
-        self.View_Self=View_Self
+        self.view_self=view_self
     async def callback(self,interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
@@ -174,16 +170,16 @@ class Member_Role_Select(discord.ui.RoleSelect):
         member_role_id=self.values[0].id
         Configure(interaction.guild_id,member_role_id=member_role_id)
         await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the member role to {self.values[0].mention}",colour=0x00F3FF),view=None)
-        self.View_Self.stop()
+        self.view_self.stop()
 
 class Bypass_Roles_View(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(Bypass_Roles_Select(self))
 class Bypass_Roles_Select(discord.ui.RoleSelect):
-    def __init__(self,View_Self):
+    def __init__(self,view_self):
         super().__init__(placeholder="Moderator Roles",min_values=1,max_values=25,custom_id="bypass_roles_select")
-        self.View_Self=View_Self
+        self.view_self=view_self
     async def callback(self,interaction):
         allowed,error_message=Checks.Admin_Only_Interaction(interaction)
         if not(allowed):
@@ -197,4 +193,4 @@ class Bypass_Roles_Select(discord.ui.RoleSelect):
         Roles=Roles[:-2]
         Configure(interaction.guild_id,moderator_roles_ids_list=moderator_roles_ids_list)
         await interaction.response.edit_message(embed=discord.Embed(description=f"Successfully set the moderator roles: {Roles}",colour=0x00F3FF),view=None)
-        self.View_Self.stop()
+        self.view_self.stop()
