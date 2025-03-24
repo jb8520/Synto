@@ -1,97 +1,110 @@
-import discord, typing
+import discord
+
 from discord import app_commands
 from discord.ext import commands
 
+import typing
+
+
+# TicTacToe command
 class TicTacToe_Cog(commands.Cog):
     def __init__(self,bot:commands.bot):
         self.bot=bot
+    
     class TicTacToe(discord.ui.View):
-        class TicTacToeButton(discord.ui.Button["discord.ui.View.TicTacToe"]):
+        class TicTacToeButton(discord.ui.Button['discord.ui.View.TicTacToe']):
             def __init__(self,x:int,y:int):
-                super().__init__(style=discord.ButtonStyle.grey,label="\u200b",row=y)
+                super().__init__(style=discord.ButtonStyle.grey,label='\u200b',row=y)
                 self.x=x
                 self.y=y
+            
             async def callback(self,interaction:discord.Interaction):
                 view:view.TicTacToe=self.view #type:ignore
-                if view.Current_player==view.Player_1==0:
-                    view.Player_1=view.Current_player=interaction.user.id
-                elif view.Current_player==view.Player_2==0:
-                    if interaction.user.id==view.Player_1:
-                        await interaction.response.send_message(f"❌ {interaction.user.mention} you can not play against yourself.",ephemeral=True)
+                if view.current_player==view.player_1==0:
+                    view.player_1=view.current_player=interaction.user.id
+                elif view.current_player==view.player_2==0:
+                    if interaction.user.id==view.player_1:
+                        await interaction.response.send_message(f'❌ {interaction.user.mention} you can not play against yourself.',ephemeral=True)
                         return
-                    view.Player_2=view.Current_player=interaction.user.id
-                if view.Current_player==view.Player_1==interaction.user.id:
+                    view.player_2=view.current_player=interaction.user.id
+                if view.current_player==view.player_1==interaction.user.id:
                     self.style=discord.ButtonStyle.red
-                    self.label="X"
+                    self.label='X'
                     self.disabled=True
-                    view.Board[self.y][self.x]=1
-                    view.Current_player=view.Player_2
-                    if view.Player_2==0:
-                        Content="It is now Player 2's turn"
+                    view.board[self.y][self.x]=1
+                    view.current_player=view.player_2
+                    if view.player_2==0:
+                        content='It is now Player 2\'s turn'
                     else:
-                        Content=f"It is now {interaction.guild.get_member(view.Player_2).mention}'s turn."
-                elif view.Current_player==view.Player_2==interaction.user.id:
+                        content=f'It is now {interaction.guild.get_member(view.player_2).mention}\'s turn.'
+                elif view.current_player==view.player_2==interaction.user.id:
                     self.style=discord.ButtonStyle.green
-                    self.label="O"
+                    self.label='O'
                     self.disabled=True
-                    view.Board[self.y][self.x]=-1
-                    view.Current_player=view.Player_1
-                    Content=f"It is now {interaction.guild.get_member(view.Player_1).mention}'s turn."
+                    view.board[self.y][self.x]=-1
+                    view.current_player=view.player_1
+                    content=f'It is now {interaction.guild.get_member(view.player_1).mention}\'s turn.'
                 else:
-                    if view.Current_player==view.Player_1 and view.Player_2==interaction.user.id or view.Current_player==view.Player_2 and view.Player_1==interaction.user.id:
-                        Message="❌ it is not your turn." 
+                    if view.current_player==view.player_1 and view.player_2==interaction.user.id or view.current_player==view.player_2 and view.player_1==interaction.user.id:
+                        message='❌ it is not your turn.' 
                     else:
-                        Message="❌ this is not your game." 
-                    await interaction.response.send_message(f"{interaction.user.mention} {Message}",ephemeral=True)
+                        message='❌ this is not your game.' 
+                    await interaction.response.send_message(f'{interaction.user.mention} {message}',ephemeral=True)
                     return
-                Winner=view.Winner_Check(view.Player_1,view.Player_2)
-                if Winner is not None:
-                    if Winner==view.Player_1:
-                        Content=f"{interaction.guild.get_member(view.Player_1).mention} won!"
-                    elif Winner==view.Player_2:
-                        Content=f"{interaction.guild.get_member(view.Player_2).mention} won!"
+                winner=view.Winner_Check(view.player_1,view.player_2)
+                if winner is not None:
+                    if winner==view.player_1:
+                        content=f'{interaction.guild.get_member(view.player_1).mention} won!'
+                    elif winner==view.player_2:
+                        content=f'{interaction.guild.get_member(view.player_2).mention} won!'
                     else:
-                        Content="It's a tie!"
+                        content='It\'s a tie!'
                     for child in view.children:
                         child.disabled=True
                     view.stop()
-                await interaction.response.edit_message(content=Content,view=view)
+                await interaction.response.edit_message(content=content,view=view)
+        
         children:typing.List[TicTacToeButton]
+        
         def __init__(self):
             super().__init__()
-            self.Board=[[0,0,0],[0,0,0],[0,0,0]]
-            self.Player_1=self.Player_2=self.Current_player=0
+            self.board=[[0,0,0],[0,0,0],[0,0,0]]
+            self.player_1=self.player_2=self.current_player=0
             for x in range(3):
                 for y in range(3):
                     self.add_item(self.TicTacToeButton(x,y))
-        def Winner_Check(self,Player_1,Player_2):
-            for Row in self.Board:
-                Value=sum(Row)
-                if Value==3:
-                    return Player_1
-                elif Value==-3:
-                    return Player_2
+        
+        def Winner_Check(self,player_1,player_2):
+            for row in self.board:
+                value=sum(row)
+                if value==3:
+                    return player_1
+                elif value==-3:
+                    return player_2
             for i in range(3):
-                Value=self.Board[0][i]+self.Board[1][i]+self.Board[2][i]
-                if Value==3:
-                    return Player_1
-                elif Value==-3:
-                    return Player_2
-            Diagonal=self.Board[0][2]+self.Board[1][1]+self.Board[2][0]
-            if Diagonal==3:
-                return Player_1
-            elif Diagonal==-3:
-                return Player_2
-            Diagonal=self.Board[0][0]+self.Board[1][1]+self.Board[2][2]
-            if Diagonal==3:
-                return Player_1
-            elif Diagonal==-3:
-                return Player_2
-            if all(i!=0 for Row in self.Board for i in Row):
+                value=self.board[0][i]+self.board[1][i]+self.board[2][i]
+                if value==3:
+                    return player_1
+                elif value==-3:
+                    return player_2
+            diagonal=self.board[0][2]+self.board[1][1]+self.board[2][0]
+            if diagonal==3:
+                return player_1
+            elif diagonal==-3:
+                return player_2
+            diagonal=self.board[0][0]+self.board[1][1]+self.board[2][2]
+            if diagonal==3:
+                return player_1
+            elif diagonal==-3:
+                return player_2
+            if all(i!=0 for row in self.board for i in row):
                 return 0
             return
+    
     @app_commands.command()
     async def tictactoe(self,interaction:discord.Interaction):
-        await interaction.response.send_message("Tic Tac Toe: X goes first",view=self.TicTacToe())
+        await interaction.response.send_message('Tic Tac Toe: X goes first',view=self.TicTacToe())
+
+
 async def setup(bot:commands.bot):
     await bot.add_cog(TicTacToe_Cog(bot))
