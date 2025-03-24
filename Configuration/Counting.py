@@ -11,7 +11,7 @@ class Counting_Menu_View(discord.ui.View):
         self.add_item(Setup.Select_Menu())
     def Embed(self,interaction):
         Embed=discord.Embed(title='**Counting Settings ⚙️**',colour=0x00F3FF)
-        channel_id,double_count=Query(interaction.guild.id)
+        channel_id,highscore,current_score,message_id,author_id,double_count=Query(interaction.guild.id)
         if channel_id==0:
             channel='#channel'
         else:
@@ -55,7 +55,7 @@ class Counting_Menu_View(discord.ui.View):
     async def information(self,interaction:discord.Interaction,button:discord.ui.Button):
         Embed=discord.Embed(title='Counting Settings Information ℹ️',colour=0x00F3FF)
         Embed.add_field(name='Counting Channel',value='> The channel where members can use the bots counting feature.',inline=False)
-        Embed.add_field(name='Double Count',value="> True/False: whether a member should be able to count multiple times in a row. True they can, false they can't.",inline=False)
+        Embed.add_field(name='Double Count',value='> True/False: whether a member should be able to count multiple times in a row. True they can, false they can\'t.',inline=False)
         await interaction.response.send_message(embed=Embed,ephemeral=True)
     @discord.ui.button(emoji='🗑️',style=discord.ButtonStyle.red,row=1,custom_id='counting_delete')
     async def delete(self,interaction:discord.Interaction,button:discord.ui.Button):

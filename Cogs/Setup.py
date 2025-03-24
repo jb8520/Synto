@@ -4,12 +4,14 @@ from discord.ext import commands
 
 import Checks
 
+
 from Configuration.Counting import Counting_Menu_View
-from DataBase.Counting import Configure as Counting_Configure, Query as Counting_Query
+from DataBase.Counting import Query as Counting_Query
 from Configuration.Auto_Vc import Auto_Vcs_Menu_View
 from DataBase.Auto_Vc import Query as Auto_Vc_Query
 from Configuration.Welcome_Message import Welcome_Message_Menu_View
-from DataBase.Welcome_Message import Configure as Welcome_Message_Configure, Query as Welcome_Message_Query
+from DataBase.Welcome_Message import Query as Welcome_Message_Query
+
 
 class Select_Menu_View(discord.ui.View):
     def __init__(self):

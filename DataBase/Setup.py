@@ -3,8 +3,10 @@ import mysql.connector, os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 def DataBase_Connection():
     return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
+
 
 def Add_Auto_Vc_Table():
     Connection=DataBase_Connection()
@@ -41,6 +43,7 @@ def Add_Welcome_Message_Table():
     Connection.commit()
     Cursor.close()
     Connection.close()
+
 
 # Add_Auto_Vc_Table()
 # Add_Counting_Table()

@@ -1,7 +1,9 @@
 import discord
+
 from discord.ext import commands
 
 import Checks
+
 
 from DataBase.Auto_Vc import Query, Member_Role_Query, Moderator_Roles_Query
 
@@ -183,7 +185,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         except KeyError:
             auto_vcs=[]
             auto_vc_owners=[]
-        position=auto_vc_owners.index(interaction.guild.id)
+        position=auto_vc_owners.index(interaction.user.id)
         channel_id=auto_vcs[position]
         channel=interaction.guild.get_channel(channel_id)
         view=Invite_View(channel)

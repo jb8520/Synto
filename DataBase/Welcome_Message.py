@@ -3,6 +3,7 @@ import mysql.connector, os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 def DataBase_Connection():
     return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
 
@@ -39,6 +40,8 @@ def Activated_Query(guild_id):
     activated=True if fetch=='True' else False
     return activated,'✅ Success!'
 
+
+
 def Add_Server(guild_id,connection=DataBase_Connection(),cursor=None):
     if cursor is None:
         cursor=connection.cursor()
@@ -71,6 +74,7 @@ def Query(guild_id):
     activated=True if activated=='True' else False
     return channel_id,title,description,colour,activated
 
+
 def Configure(guild_id,channel_id=None,title=None,description=None,colour=None,activated=None):
     connection=DataBase_Connection()
     cursor=connection.cursor()
@@ -80,19 +84,29 @@ def Configure(guild_id,channel_id=None,title=None,description=None,colour=None,a
         Add_Server(guild_id,connection,cursor)
     updated=False
     if channel_id is not None:
-        cursor.execute(f"UPDATE Welcome_Message SET channel_id='{channel_id}' WHERE guild_id='{guild_id}'")
+        channel_id=str(channel_id)
+        query="UPDATE Welcome_Message SET channel_id='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(channel_id,guild_id))
         updated=True
     if title is not None:
-        cursor.execute(f"UPDATE Welcome_Message SET title='{title}' WHERE guild_id='{guild_id}'")
+        title=connection.converter.escape(str(title))
+        query="UPDATE Welcome_Message SET title='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(title,guild_id))
         updated=True
     if description is not None:
-        cursor.execute(f"UPDATE Welcome_Message SET description='{description}' WHERE guild_id='{guild_id}'")
+        description=connection.converter.escape(str(description))
+        query="UPDATE Welcome_Message SET description='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(description,guild_id))
         updated=True
     if colour is not None:
-        cursor.execute(f"UPDATE Welcome_Message SET colour='{colour}' WHERE guild_id='{guild_id}'")
+        colour=connection.converter.escape(str(colour))
+        query="UPDATE Welcome_Message SET colour='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(colour,guild_id))
         updated=True
     if activated is not None:
-        cursor.execute(f"UPDATE Welcome_Message SET activated='{activated}' WHERE guild_id='{guild_id}'")
+        activated=str(activated)
+        query="UPDATE Welcome_Message SET activated='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(activated,guild_id))
         updated=True
     if updated:
         connection.commit()

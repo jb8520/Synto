@@ -1,8 +1,10 @@
 import discord
+
 from discord import app_commands
 from discord.ext import commands
 
 import typing
+
 
 # TicTacToe command
 class TicTacToe_Cog(commands.Cog):
@@ -32,16 +34,16 @@ class TicTacToe_Cog(commands.Cog):
                     view.board[self.y][self.x]=1
                     view.current_player=view.player_2
                     if view.player_2==0:
-                        content="It is now Player 2's turn"
+                        content='It is now Player 2\'s turn'
                     else:
-                        content=f"It is now {interaction.guild.get_member(view.player_2).mention}'s turn."
+                        content=f'It is now {interaction.guild.get_member(view.player_2).mention}\'s turn.'
                 elif view.current_player==view.player_2==interaction.user.id:
                     self.style=discord.ButtonStyle.green
                     self.label='O'
                     self.disabled=True
                     view.board[self.y][self.x]=-1
                     view.current_player=view.player_1
-                    content=f"It is now {interaction.guild.get_member(view.player_1).mention}'s turn."
+                    content=f'It is now {interaction.guild.get_member(view.player_1).mention}\'s turn.'
                 else:
                     if view.current_player==view.player_1 and view.player_2==interaction.user.id or view.current_player==view.player_2 and view.player_1==interaction.user.id:
                         message='❌ it is not your turn.' 
@@ -56,7 +58,7 @@ class TicTacToe_Cog(commands.Cog):
                     elif winner==view.player_2:
                         content=f'{interaction.guild.get_member(view.player_2).mention} won!'
                     else:
-                        content="It's a tie!"
+                        content='It\'s a tie!'
                     for child in view.children:
                         child.disabled=True
                     view.stop()

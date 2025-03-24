@@ -157,7 +157,7 @@ class Vc_Creator_Select(discord.ui.ChannelSelect):
             await interaction.response.send_message(error_message,ephemeral=True)
             return
         vc_creator=self.values[0]
-        vc_creator_id=vc_creator
+        vc_creator_id=vc_creator.id
         Configure(interaction.guild_id,vc_creator_id=vc_creator_id)
         await interaction.response.edit_message(embed=discord.Embed(description=f'Successfully set the auto vc creator channel to {self.values[0].mention}',colour=0x00F3FF),view=None)
         self.view_self.stop()

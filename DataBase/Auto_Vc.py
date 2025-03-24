@@ -80,6 +80,7 @@ def Moderator_Roles_Query(guild_id):
     return moderator_roles_ids_list
 
 
+
 def Add_Server(guild_id,connection=DataBase_Connection(),cursor=None):
     if cursor is None:
         cursor=connection.cursor()

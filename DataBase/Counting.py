@@ -3,8 +3,30 @@ import mysql.connector, os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 def DataBase_Connection():
     return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
+
+
+def Update(Guild_id,Score,Query,Message_id=None,Author_id=None):
+    Connection=DataBase_Connection()
+    Cursor=Connection.cursor()
+    Cursor.execute(f"UPDATE Counting SET {Query}='{Score}' WHERE guild_id='{Guild_id}'")
+    Connection.commit()
+    if Message_id is not None:
+        Cursor.execute(f"UPDATE Counting SET message_id={Message_id} WHERE guild_id='{Guild_id}'")
+        Connection.commit()
+    else:
+        Cursor.execute(f"UPDATE Counting SET message_id=0 WHERE guild_id='{Guild_id}'")
+        Connection.commit()
+    if Author_id is not None:
+        Cursor.execute(f"UPDATE Counting SET author_id={Author_id} WHERE guild_id='{Guild_id}'")
+        Connection.commit()
+    else:
+        Cursor.execute(f"UPDATE Counting SET Author_id=0 WHERE guild_id='{Guild_id}'")
+        Connection.commit()
+    Cursor.close()
+    Connection.close()
 
 
 def Counting_Channel_Query(guild_id):
@@ -71,7 +93,7 @@ def Query(guild_id):
     current_score=int(current_score)
     message_id=int(message_id)
     author_id=int(author_id)
-    double_count=bool(double_count)
+    double_count=True if double_count=='True' else False
     return channel_id,highscore,current_score,message_id,author_id,double_count
 
 
@@ -84,32 +106,16 @@ def Configure(guild_id,channel_id=None,double_count=None):
         Add_Server(guild_id,connection,cursor)
     updated=False
     if channel_id is not None:
-        cursor.execute(f"UPDATE Counting SET channel_id='{channel_id}' WHERE guild_id='{guild_id}'")
+        channel_id=str(channel_id)
+        query="UPDATE Counting SET channel_id='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(channel_id,guild_id))
         updated=True
     if double_count is not None:
-        cursor.execute(f"UPDATE Counting SET double_count='{double_count}' WHERE guild_id='{guild_id}'")
+        double_count=str(double_count)
+        query="UPDATE Counting SET double_count='{}' WHERE guild_id='{}'"
+        cursor.execute(query.format(double_count,guild_id))
         updated=True
     if updated:
         connection.commit()
     cursor.close()
     connection.close()
-
-def Update(Guild_id,Score,Query,Message_id=None,Author_id=None):
-    Connection=DataBase_Connection()
-    Cursor=Connection.cursor()
-    Cursor.execute(f"UPDATE Counting SET {Query}='{Score}' WHERE guild_id='{Guild_id}'")
-    Connection.commit()
-    if Message_id is not None:
-        Cursor.execute(f"UPDATE Counting SET message_id={Message_id} WHERE guild_id='{Guild_id}'")
-        Connection.commit()
-    else:
-        Cursor.execute(f"UPDATE Counting SET message_id=0 WHERE guild_id='{Guild_id}'")
-        Connection.commit()
-    if Author_id is not None:
-        Cursor.execute(f"UPDATE Counting SET author_id={Author_id} WHERE guild_id='{Guild_id}'")
-        Connection.commit()
-    else:
-        Cursor.execute(f"UPDATE Counting SET Author_id=0 WHERE guild_id='{Guild_id}'")
-        Connection.commit()
-    Cursor.close()
-    Connection.close()
