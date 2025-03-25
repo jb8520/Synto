@@ -72,6 +72,8 @@ async def servers_command(ctx:commands.Context,invite='off'):
     servers_message='Servers:\n'
     if invite.lower()=='on':
         invites_activated=True
+    else:
+        invites_activated=False
     for server in bot.guilds:
         servers_message+=f'{server}'
         if invites_activated:
