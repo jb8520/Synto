@@ -76,7 +76,7 @@ class Other(commands.Cog):
         await interaction.response.send_message('setup complete',ephemeral=True)
         Embed=discord.Embed(title='Auto Vc Control Panel',description='You can use this interface to manage your voice channel.',colour=0x00F3FF)
         Embed.set_footer(text='Use the buttons below to manage your voice channel')
-        Embed.set_image(url='https://media.discordapp.net/attachments/876226484363202580/1186442888024965180/button_interface_5.png?ex=6593440b&is=6580cf0b&hm=c7f06a4fb2c7f58f87b02f1e0e780944bcaab8ca1def3f8727dcab4e50159633&=&format=webp&quality=lossless&width=532&height=120')
+        Embed.set_image(url='https://media.discordapp.net/attachments/876226484363202580/1386148076770824262/new-interface-image-2.png?ex=6858a67e&is=685754fe&hm=b7b9450b4ef22856df8f07c34cf080663e993e8d31f45603d5c9fef2dca09687&=&format=webp&quality=lossless&width=2207&height=866')
         await interaction.channel.send(embed=Embed,view=Auto_Vc_Buttons())
     
     #rock paper scissors game

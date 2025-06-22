@@ -22,7 +22,10 @@ def Admin_Only_Interaction(interaction:discord.Interaction):
     return Allowed,'❌ You need to have the administrator permission to use this feature'
 
 def Auto_Vc_Owner_Interaction(interaction:discord.Interaction):
-    auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+    try:
+        auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+    except KeyError:
+        auto_vc_owners=[]
     if interaction.user.id in auto_vc_owners:
         Allowed=True
     else:

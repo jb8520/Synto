@@ -35,6 +35,28 @@ class Rename_Modal(discord.ui.Modal,title='Rename'):
         else:
             await interaction.response.send_message('❌ The name must be between 1 and 100 characters',ephemeral=True)
 
+class Kick_View(discord.ui.View):
+    def __init__(self,channel):
+        super().__init__()
+        self.add_item(Kick_Select(self,channel))
+
+class Kick_Select(discord.ui.UserSelect):
+    def __init__(self,View_Self:discord.ui.View,channel:discord.VoiceChannel):
+        super().__init__(placeholder='Kick Members',min_values=1,max_values=25)
+        self.View_Self=View_Self
+        self.channel=channel
+    
+    async def callback(self,interaction:discord.Interaction):
+        overwrites=self.channel.overwrites
+        for option in self.values:
+            member=interaction.guild.get_member(option.id)
+            if self.channel.permissions_for(member)!=None:
+                overwrites[member]=discord.PermissionOverwrite(connect=False)
+                await self.channel.edit(overwrites=overwrites)
+            await member.move_to(None)
+        await interaction.response.send_message('✅ Success!',ephemeral=True)
+        self.View_Self.stop()
+
 class Invite_View(discord.ui.View):
     def __init__(self,channel):
         super().__init__()
@@ -109,90 +131,7 @@ class Auto_Vc_Buttons(discord.ui.View):
         await channel.set_permissions(member_role,overwrite=permissions)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
     
-    @discord.ui.button(emoji='<:Hide:1167457445082308638>',style=discord.ButtonStyle.grey,custom_id='hide',row=0)
-    async def hide(self,interaction:discord.Interaction,button:discord.ui.Button):
-        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
-        if not(allowed):
-            await interaction.response.send_message(error_message,ephemeral=True)
-            return
-        try:
-            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
-            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
-        except KeyError:
-            auto_vcs=[]
-            auto_vc_owners=[]
-        position=auto_vc_owners.index(interaction.user.id)
-        channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
-        try:
-            member_role=interaction.guild.get_role(member_role_id)
-        except AttributeError:
-            await interaction.response.send_message('❌ An error occured! Please try again and if the issue persists contact synto support',ephemeral=True)
-        permissions=channel.overwrites_for(member_role)
-        permissions.view_channel=False
-        await channel.set_permissions(member_role,overwrite=permissions)
-        await interaction.response.send_message('✅ Success!',ephemeral=True)
-    
-    @discord.ui.button(emoji='<:Show:1167457420004577370>',style=discord.ButtonStyle.grey,custom_id='show',row=0)
-    async def show(self,interaction:discord.Interaction,button:discord.ui.Button):
-        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
-        if not(allowed):
-            await interaction.response.send_message(error_message,ephemeral=True)
-            return
-        try:
-            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
-            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
-        except KeyError:
-            auto_vcs=[]
-            auto_vc_owners=[]
-        position=auto_vc_owners.index(interaction.user.id)
-        channel=interaction.guild.get_channel(auto_vcs[position])
-        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
-        try:
-            member_role=interaction.guild.get_role(member_role_id)
-        except AttributeError:
-            await interaction.response.send_message('❌ An error occured! Please try again and if the issue persists contact synto support',ephemeral=True)
-        permissions=channel.overwrites_for(member_role)
-        permissions.view_channel=True
-        await channel.set_permissions(member_role,overwrite=permissions)
-        await interaction.response.send_message('✅ Success!',ephemeral=True)
-    
-    @discord.ui.button(emoji='<:Users:1167457429324304556>',style=discord.ButtonStyle.grey,custom_id='limit',row=1)
-    async def user_limit(self,interaction:discord.Interaction,button:discord.ui.Button):
-        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
-        if not(allowed):
-            await interaction.response.send_message(error_message,ephemeral=True)
-            return
-        await interaction.response.send_modal(User_Limit_Modal())
-    
-    @discord.ui.button(emoji='<:Rename:1167457460852891748>',style=discord.ButtonStyle.grey,custom_id='rename',row=1)
-    async def rename(self,interaction:discord.Interaction,button:discord.ui.Button):
-        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
-        if not(allowed):
-            await interaction.response.send_message(error_message,ephemeral=True)
-            return
-        await interaction.response.send_modal(Rename_Modal())
-    
-    @discord.ui.button(emoji='<:Invite:1167457438576934912>',style=discord.ButtonStyle.grey,custom_id='invite',row=1)
-    async def invite(self,interaction:discord.Interaction,button:discord.ui.Button):
-        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
-        if not(allowed):
-            await interaction.response.send_message(error_message,ephemeral=True)
-            return
-        try:
-            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
-            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
-        except KeyError:
-            auto_vcs=[]
-            auto_vc_owners=[]
-        position=auto_vc_owners.index(interaction.user.id)
-        channel_id=auto_vcs[position]
-        channel=interaction.guild.get_channel(channel_id)
-        view=Invite_View(channel)
-        await interaction.response.send_message('Please select the roles and/or members you want to give access to this voice channel',view=view,ephemeral=True)
-        await view.wait()
-    
-    @discord.ui.button(emoji='<:Claim:1174656588338954311>',style=discord.ButtonStyle.grey,custom_id='claim',row=1)
+    @discord.ui.button(emoji='<:Claim:1174656588338954311>',style=discord.ButtonStyle.grey,custom_id='claim',row=0)
     async def claim_ownership(self,interaction:discord.Interaction,button:discord.ui.Button):
         try:
             auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
@@ -221,6 +160,112 @@ class Auto_Vc_Buttons(discord.ui.View):
                                 await interaction.response.send_message('✅ Success!',ephemeral=True)
                                 return
         await interaction.response.send_message('❌ You are not in a claimable vc',ephemeral=True)
+
+
+
+    @discord.ui.button(emoji='<:Hide:1167457445082308638>',style=discord.ButtonStyle.grey,custom_id='hide',row=1)
+    async def hide(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        try:
+            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
+            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+        except KeyError:
+            auto_vcs=[]
+            auto_vc_owners=[]
+        position=auto_vc_owners.index(interaction.user.id)
+        channel=interaction.guild.get_channel(auto_vcs[position])
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
+        try:
+            member_role=interaction.guild.get_role(member_role_id)
+        except AttributeError:
+            await interaction.response.send_message('❌ An error occured! Please try again and if the issue persists contact synto support',ephemeral=True)
+        permissions=channel.overwrites_for(member_role)
+        permissions.view_channel=False
+        await channel.set_permissions(member_role,overwrite=permissions)
+        await interaction.response.send_message('✅ Success!',ephemeral=True)
+    
+    @discord.ui.button(emoji='<:Show:1167457420004577370>',style=discord.ButtonStyle.grey,custom_id='show',row=1)
+    async def show(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        try:
+            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
+            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+        except KeyError:
+            auto_vcs=[]
+            auto_vc_owners=[]
+        position=auto_vc_owners.index(interaction.user.id)
+        channel=interaction.guild.get_channel(auto_vcs[position])
+        member_role_id,error_message=Member_Role_Query(interaction.guild.id)
+        try:
+            member_role=interaction.guild.get_role(member_role_id)
+        except AttributeError:
+            await interaction.response.send_message('❌ An error occured! Please try again and if the issue persists contact synto support',ephemeral=True)
+        permissions=channel.overwrites_for(member_role)
+        permissions.view_channel=True
+        await channel.set_permissions(member_role,overwrite=permissions)
+        await interaction.response.send_message('✅ Success!',ephemeral=True)
+    
+    @discord.ui.button(emoji='<:Rename:1167457460852891748>',style=discord.ButtonStyle.grey,custom_id='rename',row=1)
+    async def rename(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        await interaction.response.send_modal(Rename_Modal())
+
+
+
+    @discord.ui.button(emoji='<:Kick:1386150479804764280>',style=discord.ButtonStyle.grey,custom_id='kick',row=2)
+    async def kick(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        try:
+            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
+            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+        except KeyError:
+            auto_vcs=[]
+            auto_vc_owners=[]
+        position=auto_vc_owners.index(interaction.user.id)
+        channel_id=auto_vcs[position]
+        channel=interaction.guild.get_channel(channel_id)
+        view=Kick_View(channel)
+        await interaction.response.send_message('Please select the members you want to kick from this voice channel',view=view,ephemeral=True)
+        await view.wait()
+
+    @discord.ui.button(emoji='<:Invite:1386150477846020136>',style=discord.ButtonStyle.grey,custom_id='invite',row=2)
+    async def invite(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        try:
+            auto_vcs:list=interaction.client.auto_vcs[interaction.guild.id]
+            auto_vc_owners:list=interaction.client.auto_vc_owners[interaction.guild.id]
+        except KeyError:
+            auto_vcs=[]
+            auto_vc_owners=[]
+        position=auto_vc_owners.index(interaction.user.id)
+        channel_id=auto_vcs[position]
+        channel=interaction.guild.get_channel(channel_id)
+        view=Invite_View(channel)
+        await interaction.response.send_message('Please select the roles and/or members you want to give access to this voice channel',view=view,ephemeral=True)
+        await view.wait()
+    
+    @discord.ui.button(emoji='<:Users:1386150481138810960>',style=discord.ButtonStyle.grey,custom_id='limit',row=2)
+    async def user_limit(self,interaction:discord.Interaction,button:discord.ui.Button):
+        allowed,error_message=Checks.Auto_Vc_Owner_Interaction(interaction)
+        if not(allowed):
+            await interaction.response.send_message(error_message,ephemeral=True)
+            return
+        await interaction.response.send_modal(User_Limit_Modal())
 
 class Auto_Vc(commands.Cog):
     def __init__(self,bot:commands.Bot):
