@@ -1,3 +1,3 @@
-discord.py
-python-dotenv
-mysql.connector
+discord.py==2.5.2
+mysql-connector==2.2.9
+python-dotenv==1.1.0
