@@ -36,7 +36,7 @@ Whether you're running a small community or a large server, Synto brings useful 
     - python-dotenv==2.2.9
 
 
-## Installation
+### Installation
 
 ```bash
 git clone https://github.com/jb8520/synto.git
