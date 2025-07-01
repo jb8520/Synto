@@ -57,7 +57,7 @@ class Connect_4_Select_Menu(discord.ui.Select):
         if y==0:
             for child in view.children:
                 if isinstance(child,discord.ui.Select):
-                    child.options=[option for option in child.options if option.value!=x]
+                    child.options=[option for option in child.options if int(option.value)!=x]
 
         content=f'It is now {other_player}\'s turn.'
         message=view.Display_Board()
