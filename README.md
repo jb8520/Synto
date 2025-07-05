@@ -32,8 +32,8 @@ Whether you're running a small community or a large server, Synto brings useful 
 - MySQL Server (or compatible)
 - Packages (requirements.txt):
     - discord.py==2.5.2
-    - mysql-connector==1.1.0
-    - python-dotenv==2.2.9
+    - mysql-connector==2.2.9
+    - python-dotenv==1.1.0
 
 
 ### Installation
