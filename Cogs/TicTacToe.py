@@ -5,6 +5,7 @@ from discord.ext import commands
 
 import typing
 
+from DataBase import log_command
 
 # TicTacToe command
 class TicTacToe_Cog(commands.Cog):
@@ -104,6 +105,11 @@ class TicTacToe_Cog(commands.Cog):
     @app_commands.command()
     async def tictactoe(self,interaction:discord.Interaction):
         await interaction.response.send_message('Tic Tac Toe: X goes first',view=self.TicTacToe())
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'tictactoe'
+        )
 
 
 async def setup(bot:commands.bot):

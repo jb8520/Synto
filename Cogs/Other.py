@@ -1,6 +1,6 @@
 import discord
 
-from discord import app_commands
+from discord import app_commands, Member
 from discord.ext import commands
 
 import os, datetime, random
@@ -14,13 +14,15 @@ from DataBase.Auto_Vc import Remove_Server as Auto_Vc_Remove_Server
 from DataBase.Counting import Remove_Server as Counting_Remove_Server
 from DataBase.Welcome_Message import Remove_Server as Welcome_Message_Remove_Server
 
+from DataBase import log_command, log_welcome_message, log_games
+
 class Other(commands.Cog):
     def __init__(self,bot:commands.Bot):
         self.bot=bot
     
     # welcome message listener
     @commands.Cog.listener()
-    async def on_member_join(self,member):
+    async def on_member_join(self,member: Member):
         Welcome_Message_Configure(member.guild.id)
         channel_id,title,description,colour,activated=Welcome_Message_Query(member.guild.id)
         if activated:
@@ -48,6 +50,10 @@ class Other(commands.Cog):
             Embed.set_footer(text=f'ID: {str(member.id)}')
             Embed.timestamp=datetime.datetime.now()
             await welcome_channel.send(embed=Embed)
+            log_welcome_message(
+                user_id = member.id,
+                guild_id = member.guild.id
+            )
     
     # remove a server from the database when the bot leaves that server
     @commands.Cog.listener('on_guild_remove')
@@ -65,6 +71,11 @@ class Other(commands.Cog):
         Embed.add_field(name='Welcome Message',value='> To enable the welcome message functionality, a welcome channel needs to be selected and the feature needs to be activated from within the configuration command.')
         Embed.set_thumbnail(url='https://media.discordapp.net/attachments/1166916938530816018/1254624501115912223/Synto_Profile.png?ex=667a2b9e&is=6678da1e&hm=061315c8fecb685fa44cccb2611a01f5567d40d5dd7db1f93a21e3986c669516&=&format=webp&quality=lossless&width=437&height=437')
         await interaction.response.send_message(embed=Embed)
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'setup'
+        )
     
     # sends the auto vc control panel message
     @app_commands.command(name='control_panel',description='Sends the auto vc control panel')
@@ -78,6 +89,11 @@ class Other(commands.Cog):
         Embed.set_footer(text='Use the buttons below to manage your voice channel')
         Embed.set_image(url='https://media.discordapp.net/attachments/876226484363202580/1386148076770824262/new-interface-image-2.png?ex=6858a67e&is=685754fe&hm=b7b9450b4ef22856df8f07c34cf080663e993e8d31f45603d5c9fef2dca09687&=&format=webp&quality=lossless&width=2207&height=866')
         await interaction.channel.send(embed=Embed,view=Auto_Vc_Buttons())
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'control_panel'
+        )
     
     #rock paper scissors game
     @app_commands.command(name='rps')
@@ -94,11 +110,20 @@ class Other(commands.Cog):
         else:
             result='I win!'
         await interaction.response.send_message(embed=discord.Embed(description=f'You chose {choice.value}\nI chose {bot_choice}\n{result}'))
+        log_games(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+        )
     
     # sends the latency of the bot
     @app_commands.command(name='ping',description='Sends the latency of the bot')
     async def ping(self,interaction: discord.Interaction):
         await interaction.response.send_message(f'Pong! Latency: {round(self.bot.latency*1000)}ms',ephemeral=True)
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'ping'
+        )
     
     #sends info about the bot
     @app_commands.command(name='bot-info',description='Shows info about the bot')
@@ -120,6 +145,11 @@ class Other(commands.Cog):
             with open(file,'r',encoding='utf-8') as opened_file:
                 total_lines+=len(opened_file.readlines())
         await interaction.response.send_message(embed=discord.Embed(title='Bot Status',description=f'Bot Uptime: {uptime_timestamp}\nLines of code: {total_lines}\nPing: {ping}',color=0x00F3FF),ephemeral=True)
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'bot_info'
+        )
 
 
 async def setup(bot:commands.Bot):

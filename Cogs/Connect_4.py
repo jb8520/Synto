@@ -3,6 +3,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from DataBase import log_command
+
 
 class Connect_4_Select_Menu(discord.ui.Select):
     def __init__(self):
@@ -180,6 +182,11 @@ class Connect_4_Cog(commands.Cog):
             message+='\n'
         message+='1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣\n'
         await interaction.response.send_message(message+'\nConnect 4: Red goes first',view=self.Connect_4_View())
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'connect4'
+        )
 
  
 async def setup(bot:commands.bot):

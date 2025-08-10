@@ -6,6 +6,7 @@ import Checks
 
 
 from DataBase.Auto_Vc import Query, Member_Role_Query, Moderator_Roles_Query
+from DataBase import log_auto_vc
 
 class User_Limit_Modal(discord.ui.Modal,title='User Limit'):
     selected_limit=discord.ui.TextInput(label='Enter the User Limit',style=discord.TextStyle.short,placeholder='Enter 0 for no user limit',required=True)
@@ -20,6 +21,11 @@ class User_Limit_Modal(discord.ui.Modal,title='User Limit'):
         if 0<=user_limit<100:
             await channel.edit(user_limit=int(f'{user_limit}'))
             await interaction.response.send_message('✅ Success!',ephemeral=True)
+            log_auto_vc(
+                user_id = interaction.user.id,
+                guild_id = interaction.guild.id,
+                auto_vc_type = 'set_user_limit'
+            )
         else:
             await interaction.response.send_message('❌ The user limit must be a number between 0 and 99',ephemeral=True)
 
@@ -32,6 +38,11 @@ class Rename_Modal(discord.ui.Modal,title='Rename'):
         if 0<len(new_name)<101:
             await channel.edit(name=f'{new_name}')
             await interaction.response.send_message('✅ Success!',ephemeral=True)
+            log_auto_vc(
+                user_id = interaction.user.id,
+                guild_id = interaction.guild.id,
+                auto_vc_type = 'renamed_channel'
+            )
         else:
             await interaction.response.send_message('❌ The name must be between 1 and 100 characters',ephemeral=True)
 
@@ -55,6 +66,11 @@ class Kick_Select(discord.ui.UserSelect):
                 await self.channel.edit(overwrites=overwrites)
             await member.move_to(None)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'kicked_user'
+        )
         self.View_Self.stop()
 
 class Invite_View(discord.ui.View):
@@ -77,6 +93,11 @@ class Invite_Select(discord.ui.MentionableSelect):
             overwrites[object]=discord.PermissionOverwrite(view_channel=True,connect=True)
         await self.channel.edit(overwrites=overwrites)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'permitted_user'
+        )
         self.View_Self.stop()
 
 class Auto_Vc_Buttons(discord.ui.View):
@@ -106,6 +127,11 @@ class Auto_Vc_Buttons(discord.ui.View):
         permissions.connect=False
         await channel.set_permissions(member_role,overwrite=permissions)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'locked_channel'
+        )
     
     @discord.ui.button(emoji='<:Unlock:1177249846105755718>',style=discord.ButtonStyle.grey,custom_id='unlock',row=0)
     async def unlock(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -130,6 +156,11 @@ class Auto_Vc_Buttons(discord.ui.View):
         permissions.connect=True
         await channel.set_permissions(member_role,overwrite=permissions)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'unlocked_channel'
+        )
     
     @discord.ui.button(emoji='<:Claim:1174656588338954311>',style=discord.ButtonStyle.grey,custom_id='claim',row=0)
     async def claim_ownership(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -149,6 +180,11 @@ class Auto_Vc_Buttons(discord.ui.View):
                 elif auto_vc_owners[position]==0:
                     auto_vc_owners[position]=interaction.user.id
                     await interaction.response.send_message('✅ Success!',ephemeral=True)
+                    log_auto_vc(
+                        user_id = interaction.user.id,
+                        guild_id = interaction.guild.id,
+                        auto_vc_type = 'claimed_channel'
+                    )
                     return
                 else:
                     moderator_roles_ids_list=Moderator_Roles_Query(interaction.guild.id)
@@ -158,6 +194,11 @@ class Auto_Vc_Buttons(discord.ui.View):
                             if role in interaction.user.roles:
                                 auto_vc_owners[position]=interaction.user.id
                                 await interaction.response.send_message('✅ Success!',ephemeral=True)
+                                log_auto_vc(
+                                    user_id = interaction.user.id,
+                                    guild_id = interaction.guild.id,
+                                    auto_vc_type = 'claimed_channel'
+                                )
                                 return
         await interaction.response.send_message('❌ You are not in a claimable vc',ephemeral=True)
 
@@ -186,6 +227,11 @@ class Auto_Vc_Buttons(discord.ui.View):
         permissions.view_channel=False
         await channel.set_permissions(member_role,overwrite=permissions)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'hid_channel'
+        )
     
     @discord.ui.button(emoji='<:Show:1167457420004577370>',style=discord.ButtonStyle.grey,custom_id='show',row=1)
     async def show(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -210,6 +256,11 @@ class Auto_Vc_Buttons(discord.ui.View):
         permissions.view_channel=True
         await channel.set_permissions(member_role,overwrite=permissions)
         await interaction.response.send_message('✅ Success!',ephemeral=True)
+        log_auto_vc(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            auto_vc_type = 'unhidden_channel'
+        )
     
     @discord.ui.button(emoji='<:Rename:1167457460852891748>',style=discord.ButtonStyle.grey,custom_id='rename',row=1)
     async def rename(self,interaction:discord.Interaction,button:discord.ui.Button):
@@ -300,6 +351,11 @@ class Auto_Vc(commands.Cog):
                 if number==0:
                     number=len(self.auto_vcs[member.guild.id])+1
             channel=await member.guild.create_voice_channel(f'VC {number}',category=self.bot.get_channel(vc_category_id),overwrites=overwrites)
+            log_auto_vc(
+                user_id = member.id,
+                guild_id = member.guild.id,
+                auto_vc_type = 'created_channel'
+            )
             await member.move_to(channel)
             if member.guild.id in self.auto_vcs:
                 self.auto_vcs[member.guild.id].append(channel.id)
@@ -322,6 +378,11 @@ class Auto_Vc(commands.Cog):
                         del self.auto_vc_owners[member.guild.id]
                         del self.auto_vc_number_names[member.guild.id]
                     await channel.delete()
+                    log_auto_vc(
+                        user_id = member.id,
+                        guild_id = member.guild.id,
+                        auto_vc_type = 'deleted_channel'
+                    )
                     return
                 elif before.channel!=after.channel and before.channel==channel and member.id in self.auto_vc_owners[member.guild.id]:
                     position=self.auto_vc_owners[member.guild.id].index(member.id)

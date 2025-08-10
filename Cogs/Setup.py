@@ -12,6 +12,7 @@ from DataBase.Auto_Vc import Query as Auto_Vc_Query
 from Configuration.Welcome_Message import Welcome_Message_Menu_View
 from DataBase.Welcome_Message import Query as Welcome_Message_Query
 
+from DataBase import log_command
 
 class Select_Menu_View(discord.ui.View):
     def __init__(self):
@@ -126,6 +127,11 @@ class Setup(commands.Cog):
             return
         View=Select_Menu_View()
         await interaction.response.send_message(content='Synto Configuration Settings ⚙️',ephemeral=False,view=View)
+        log_command(
+            user_id = interaction.user.id,
+            guild_id = interaction.guild.id,
+            command_name = 'configuration'
+        )
 
 async def setup(bot:commands.Bot):
     await bot.add_cog(Setup(bot))

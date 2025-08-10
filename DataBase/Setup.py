@@ -7,7 +7,25 @@ load_dotenv()
 def DataBase_Connection():
     return mysql.connector.connect(host=os.environ['DATABASE_HOST'],user=os.environ['DATABASE_USER'],password=os.environ['DATABASE_PASSWORD'],database=os.environ['DATABASE_NAME'])
 
-
+def Add_Metrics_Table():
+    Connection=DataBase_Connection()
+    Cursor=Connection.cursor()
+    Cursor.execute("CREATE TABLE IF NOT EXISTS Metrics(" \
+    "id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY," \
+    "user_id BIGINT UNSIGNED NOT NULL," \
+    "guild_id BIGINT UNSIGNED NOT NULL," \
+    "timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," \
+    "action_type VARCHAR(50) NOT NULL," \
+    "command_name VARCHAR(50) DEFAULT NULL," \
+    "auto_vc_type VARCHAR(50) DEFAULT NULL," \
+    "details JSON DEFAULT NULL)")
+    Connection.commit()
+    Cursor.execute("CREATE INDEX IF NOT EXISTS idx_action_timestamp ON Metrics(action_type, timestamp)")
+    Cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_timestamp ON Metrics(user_id, timestamp)")
+    Cursor.execute("CREATE INDEX IF NOT EXISTS idx_guild_timestamp ON Metrics(guild_id, timestamp)")
+    Connection.commit()
+    Cursor.close()
+    Connection.close()
 def Add_Auto_Vc_Table():
     Connection=DataBase_Connection()
     Cursor=Connection.cursor()
@@ -44,7 +62,7 @@ def Add_Welcome_Message_Table():
     Cursor.close()
     Connection.close()
 
-
+Add_Metrics_Table()
 # Add_Auto_Vc_Table()
 # Add_Counting_Table()
 # Add_Economy_Table()

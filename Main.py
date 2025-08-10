@@ -8,6 +8,7 @@ import Checks
 import Cogs.Auto_Vc, Cogs.Setup
 from Configuration import Auto_Vc, Counting, Welcome_Message
 
+from DataBase import log_command
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -15,26 +16,30 @@ load_dotenv()
 # initialise the bot
 class Synto(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix='?',
-                         intents=discord.Intents.all(),
-                         case_insensitive=True)
+        super().__init__(
+            command_prefix='?',
+            intents=discord.Intents.all(),
+            case_insensitive=True
+        )
     
     async def setup_hook(self):
         self.remove_command('help')
         # add the persistent views to the bot
-        persistent_ivews=[Cogs.Auto_Vc.Auto_Vc_Buttons(),
-                          Cogs.Setup.Select_Menu_View(),
-                          Auto_Vc.Auto_Vcs_Menu_View(),
-                          Auto_Vc.Vc_Creator_View(),
-                          Auto_Vc.Vc_Category_View(),
-                          Auto_Vc.Member_Role_View(),
-                          Auto_Vc.Bypass_Roles_View(),
-                          Counting.Counting_Menu_View(),
-                          Counting.Counting_Channel_View(),
-                          Counting.Counting_Double_Count_View(),
-                          Welcome_Message.Welcome_Message_Menu_View(),
-                          Welcome_Message.Welcome_Channel_View(),
-                          Welcome_Message.Welcome_Message_Activated_View()]
+        persistent_ivews=[
+            Cogs.Auto_Vc.Auto_Vc_Buttons(),
+            Cogs.Setup.Select_Menu_View(),
+            Auto_Vc.Auto_Vcs_Menu_View(),
+            Auto_Vc.Vc_Creator_View(),
+            Auto_Vc.Vc_Category_View(),
+            Auto_Vc.Member_Role_View(),
+            Auto_Vc.Bypass_Roles_View(),
+            Counting.Counting_Menu_View(),
+            Counting.Counting_Channel_View(),
+            Counting.Counting_Double_Count_View(),
+            Welcome_Message.Welcome_Message_Menu_View(),
+            Welcome_Message.Welcome_Channel_View(),
+            Welcome_Message.Welcome_Message_Activated_View()
+        ]
         for view in persistent_ivews:
             self.add_view(view)
         bot.auto_vcs={}
@@ -94,6 +99,11 @@ async def sync(ctx:commands.Context):
         return
     await ctx.message.delete()
     await bot.tree.sync()
+    log_command(
+        user_id = ctx.author.id,
+        guild_id = ctx.guild.id,
+        command_name = 'sync'
+    )
     print('Synced Commands to the Tree')
 
 
