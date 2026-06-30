@@ -106,6 +106,13 @@ Pull requests and issues are welcome! Please follow the coding style and add tes
 
 
 
+## Legal
+
+- [Terms of Service](./TERMS.md)
+- [Privacy Policy](./PRIVACY.md)
+
+
+
 ## License
 
 GNU AFFERO GENERAL PUBLIC LICENSE Version 3, © jb8520, James Boss
