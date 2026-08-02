@@ -3,71 +3,44 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from database.repositories import log_command
+from services.counting import (
+    handle_counting_message,
+    handle_deleted_counting_message,
+    build_counting_stats_embed
+)
 
-from DataBase.Counting import Query, Update
 
-from DataBase import log_command, log_counting
+class CountingCog(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
 
+    @app_commands.command(name = 'counting_stats')
+    async def counting_stats(self, interaction: discord.Interaction):
+        if interaction.guild is None:
+            return
 
-class Counting_Cog(commands.Cog):
-    def __init__(self,bot:commands.bot):
-        self.bot=bot
-    
-    # command which send stats about the counting in that server
-    @app_commands.command()
-    async def counting_stats(self,interaction:discord.Interaction):
-        channel_id,highscore,current_score,message_id,author_id,double_count=Query(interaction.guild.id)
-        await interaction.response.send_message(embed=discord.Embed(title='**Server Stats**',description=f'Highscore: {highscore}\n\nCurrent Count: {current_score}\n\nCounting Channel: {interaction.guild.get_channel(channel_id).mention}',colour=0x00f8ff),ephemeral=True)
+        embed = build_counting_stats_embed(interaction.guild)
+
+        await interaction.response.send_message(
+            embed = embed,
+            ephemeral = True
+        )
+
         log_command(
             user_id = interaction.user.id,
             guild_id = interaction.guild.id,
             command_name = 'counting_stats'
         )
-    
-    # counting listners
-    @commands.Cog.listener('on_message')
-    async def on_message(self,message:discord.Message):
-        try:
-            channel_id,highscore,current_score,message_id,author_id,double_count=Query(message.guild.id)
-            if channel_id==message.channel.id:
-                new_count=int(message.content)
-                if new_count==current_score+1:
-                    if message.author.id==author_id and not(double_count):
-                        if current_score>highscore:
-                            Update(message.guild.id,current_score,'highscore')
-                        await message.channel.send(f'{message.author.mention} ruined the count at `{current_score}`! You can\'t double count. The next number is **`1`**')
-                        await message.add_reaction('❌')
-                        Update(message.guild.id,0,'current_score')
-                    else:
-                        await message.add_reaction('✅')
-                        Update(message.guild.id,new_count,'current_score',message.id,message.author.id)
-                else:
-                    if current_score>highscore:
-                        Update(message.guild.id,current_score,'highscore')
-                    await message.channel.send(f'{message.author.mention} ruined the count at `{current_score}`! The next number is **`1`**')
-                    await message.add_reaction('❌')
-                    Update(message.guild.id,0,'current_score')
-            log_counting(
-                user_id = message.author.id,
-                guild_id = message.guild.id,
-            )
 
-        except:
-            return
-    
-    @commands.Cog.listener('on_message_delete')
-    async def on_message_delete(self,message:discord.message):
-        try:
-            channel_id,highscore,current_score,message_id,author_id,double_count=Query(message.guild.id)
-            if message.id==message_id:
-                await message.channel.send(f'{message.author.mention} deleted their count of `{current_score}`. The next number is **`{current_score+1}`**')
-                log_counting(
-                    user_id = message.author.id,
-                    guild_id = message.guild.id,
-                )
-        except:
-            return
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        await handle_counting_message(message)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message: discord.Message):
+        await handle_deleted_counting_message(message)
 
 
-async def setup(bot:commands.bot):
-    await bot.add_cog(Counting_Cog(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(CountingCog(bot))

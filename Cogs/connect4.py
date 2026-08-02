@@ -5,19 +5,19 @@ from discord.ext import commands
 
 from database.repositories import log_game
 
-from ui.views.tictactoe import TicTacToeView
+from ui.views.connect4 import Connect4View
 
 
-class TicTacToeCog(commands.Cog):
+class Connect4Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name = 'tictactoe')
-    async def tictactoe(self, interaction: discord.Interaction):
-        view = TicTacToeView()
+    @app_commands.command(name = 'connect4')
+    async def connect4(self, interaction: discord.Interaction):
+        view = Connect4View()
 
         await interaction.response.send_message(
-            'Tic Tac Toe: X goes first.',
+            f'{view.display_board()}\n\nConnect 4: Red goes first.',
             view = view,
         )
 
@@ -25,9 +25,9 @@ class TicTacToeCog(commands.Cog):
             log_game(
                 user_id = interaction.user.id,
                 guild_id = interaction.guild.id,
-                game_name = 'tictactoe',
+                game_name = 'connect4',
             )
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(TicTacToeCog(bot))
+    await bot.add_cog(Connect4Cog(bot))
