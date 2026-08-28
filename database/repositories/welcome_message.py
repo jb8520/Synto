@@ -162,6 +162,18 @@ def set_welcome_status(guild_id: int, status: bool) -> None:
         values = values
     )
 
+def toggle_welcome_status(guild_id: int) -> bool:
+    settings = get_welcome_message_settings(guild_id)
+
+    new_value = not settings.status
+
+    set_welcome_status(
+        guild_id = guild_id,
+        status = new_value
+    )
+
+    return new_value
+
 
 def update_welcome_message_settings(
     guild_id: int,

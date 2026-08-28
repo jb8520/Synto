@@ -1,6 +1,6 @@
 from ..models import CountingSettings
 
-from .base import fetch_one, execute, ensure_guild_exists
+from .base import fetch_one, execute, execute_get_rowcount, ensure_guild_exists
 
 
 def ensure_counting_settings_exist(guild_id: int) -> None:
@@ -29,7 +29,8 @@ def get_counting_settings(guild_id: int) -> CountingSettings:
             current_score,
             last_message_id,
             last_author_id,
-            double_count
+            double_count,
+            counting_saves_enabled
         FROM counting_settings
         WHERE guild_id = %s
     '''
@@ -37,7 +38,7 @@ def get_counting_settings(guild_id: int) -> CountingSettings:
     values = (
         guild_id,
     )
-    
+
     row = fetch_one(
         query = query,
         values = values
@@ -54,6 +55,7 @@ def get_counting_settings(guild_id: int) -> CountingSettings:
         last_message_id = row['last_message_id'],
         last_author_id = row['last_author_id'],
         double_count = bool(row['double_count']),
+        counting_saves_enabled = bool(row['counting_saves_enabled']),
     )
 
 
@@ -95,6 +97,49 @@ def set_double_count(guild_id: int, status: bool) -> None:
         values = values
     )
 
+def toggle_double_count(guild_id: int) -> bool:
+    settings = get_counting_settings(guild_id)
+
+    new_value = not settings.double_count
+
+    set_double_count(
+        guild_id = guild_id,
+        status = new_value
+    )
+
+    return new_value
+
+
+def set_counting_saves_enabled(guild_id: int, enabled: bool) -> None:
+    ensure_counting_settings_exist(guild_id)
+
+    query = '''
+        UPDATE counting_settings
+        SET counting_saves_enabled = %s
+        WHERE guild_id = %s
+    '''
+
+    values = (
+        enabled,
+        guild_id
+    )
+
+    execute(
+        query = query,
+        values = values
+    )
+
+def toggle_counting_saves_enabled(guild_id: int) -> bool:
+    settings = get_counting_settings(guild_id)
+
+    new_value = not settings.counting_saves_enabled
+
+    set_counting_saves_enabled(
+        guild_id = guild_id,
+        enabled = new_value
+    )
+
+    return new_value
 
 def update_current_score(
     guild_id: int,
@@ -124,6 +169,37 @@ def update_current_score(
         query = query,
         values = values
     )
+
+def advance_count_if_unchanged(
+    guild_id: int,
+    expected_current_score: int,
+    new_score: int,
+    last_message_id: int,
+    last_author_id: int
+) -> bool:
+    query = '''
+        UPDATE counting_settings
+        SET
+            current_score = %s,
+            last_message_id = %s,
+            last_author_id = %s
+        WHERE guild_id = %s AND current_score = %s
+    '''
+
+    values = (
+        new_score,
+        last_message_id,
+        last_author_id,
+        guild_id,
+        expected_current_score
+    )
+
+    rowcount = execute_get_rowcount(
+        query = query,
+        values = values
+    )
+
+    return rowcount == 1
 
 def reset_current_score(guild_id: int) -> None:
     update_current_score(

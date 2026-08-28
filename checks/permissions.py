@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from settings import settings
 
-from database.repositories import get_auto_vc_settings
+from database.repositories import get_auto_vc_settings, get_general_admin_role_ids
 
 from services.auto_vc_dataclass import AutoVcRuntime
 
@@ -19,6 +19,12 @@ async def admin_only_interaction(interaction: discord.Interaction) -> tuple[bool
         or interaction.user.id == settings.bot_owner_id
     ):
         return True, '✅ Success!'
+
+    if interaction.guild is not None:
+        admin_role_ids = set(get_general_admin_role_ids(interaction.guild.id))
+
+        if any(role.id in admin_role_ids for role in interaction.user.roles):
+            return True, '✅ Success!'
 
     error_message = '❌ You need to have the administrator permission to use this feature.'
     

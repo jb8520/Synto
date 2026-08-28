@@ -9,6 +9,7 @@ class CountingSettings:
     last_message_id: int = 0
     last_author_id: int = 0
     double_count: bool = False
+    counting_saves_enabled: bool = True
 
     @property
     def is_configured(self) -> bool:

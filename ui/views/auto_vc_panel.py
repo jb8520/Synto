@@ -1,5 +1,7 @@
 import discord
 
+from ui.config import get_settings_colour
+
 from ui.views.auto_vc import AutoVcButtons
 
 
@@ -8,11 +10,11 @@ AUTO_VC_CONTROL_PANEL_IMAGE_URL = (
 )
 
 
-def build_auto_vc_control_panel_embed() -> discord.Embed:
+def build_auto_vc_control_panel_embed(guild_id: int) -> discord.Embed:
     embed = discord.Embed(
         title = 'Auto VC Control Panel',
         description = 'Use this panel to manage your temporary voice channel.',
-        colour = 0x00F3FF
+        colour = get_settings_colour(guild_id)
     )
 
     embed.set_footer(
@@ -26,8 +28,8 @@ def build_auto_vc_control_panel_embed() -> discord.Embed:
     return embed
 
 
-async def send_auto_vc_control_panel(channel: discord.abc.Messageable) -> None:
+async def send_auto_vc_control_panel(channel: discord.abc.Messageable, guild_id: int) -> None:
     await channel.send(
-        embed = build_auto_vc_control_panel_embed(),
+        embed = build_auto_vc_control_panel_embed(guild_id),
         view = AutoVcButtons()
     )

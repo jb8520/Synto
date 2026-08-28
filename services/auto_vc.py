@@ -6,6 +6,7 @@ from database.repositories import (
     get_auto_vc_settings_by_creator_channel,
     get_auto_vc_settings,
     guild_has_premium_cached,
+    get_general_settings,
     log_auto_vc
 )
 
@@ -30,6 +31,25 @@ def can_use_auto_vc_setup(
         return True
 
     return guild_has_premium_cached(guild_id)
+
+
+def describe_auto_vc_status(
+    guild_id: int,
+    settings: AutoVCSettings
+) -> str:
+    """Mirrors can_use_auto_vc_setup's exact logic, for display purposes -
+    a non-default setup that's still marked "enabled" but has lost premium
+    is not actually usable, and shouldn't be shown as plain "Enabled"."""
+    if not settings.is_enabled:
+        return 'Disabled'
+
+    if settings.is_default:
+        return 'Enabled'
+
+    if guild_has_premium_cached(guild_id):
+        return 'Enabled'
+
+    return 'Locked (Premium required)'
 
 
 async def handle_auto_vc_voice_state_update(
@@ -67,6 +87,9 @@ async def maybe_create_auto_vc(
     after: discord.VoiceState
 ) -> None:
     if after.channel is None:
+        return
+
+    if not get_general_settings(member.guild.id).auto_vc_enabled:
         return
 
     settings = get_auto_vc_settings_by_creator_channel(

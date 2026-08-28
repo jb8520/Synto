@@ -8,6 +8,8 @@ from discord.ext import commands
 
 from database.repositories import log_command
 
+from ui.views.bot_info import BuyMeACoffeeView
+
 
 IGNORED_LINE_COUNT_DIRS = {
     '.git',
@@ -102,6 +104,29 @@ class BotInfoCog(commands.Cog):
                 user_id = interaction.user.id,
                 guild_id = interaction.guild.id,
                 command_name = 'bot_info'
+            )
+
+    @app_commands.command(
+        name = 'buy-me-a-coffee',
+        description = 'Support Synto\'s development with a donation.'
+    )
+    async def buy_me_a_coffee(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title = '☕ Support Synto',
+            description = 'If you enjoy using Synto, consider supporting its development with a coffee!',
+            colour = 0x00F3FF
+        )
+
+        await interaction.response.send_message(
+            embed = embed,
+            view = BuyMeACoffeeView()
+        )
+
+        if interaction.guild is not None:
+            log_command(
+                user_id = interaction.user.id,
+                guild_id = interaction.guild.id,
+                command_name = 'buy_me_a_coffee'
             )
 
 

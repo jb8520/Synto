@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from services.auto_vc import AutoVcRuntime
+from services.counting import CountingSaveRuntime
 from ui.views.auto_vc import AutoVcButtons
 
 
@@ -16,6 +17,7 @@ class Synto(commands.Bot):
         )
 
         self.auto_vc_runtime = AutoVcRuntime()
+        self.counting_save_runtime = CountingSaveRuntime()
         self.time = datetime.datetime.now()
 
 
@@ -61,7 +63,7 @@ class Synto(commands.Bot):
     async def on_ready(self):
         await self.change_presence(
             activity = discord.Activity(
-                name = '?help',
+                name = '/settings',
                 type = discord.ActivityType.watching,
             )
         )

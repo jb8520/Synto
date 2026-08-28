@@ -5,7 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.repositories import log_game
+from database.repositories import log_game, get_general_settings
 
 
 RPS_CHOICES = (
@@ -25,7 +25,10 @@ class GamesCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name = 'rps')
+    @app_commands.command(
+        name = 'rps',
+        description = 'Play a game of rock paper scissors against the bot.'
+    )
     @app_commands.choices(
         choice = [
             app_commands.Choice(
@@ -49,6 +52,13 @@ class GamesCog(commands.Cog):
         interaction: discord.Interaction,
         choice: app_commands.Choice[str]
     ):
+        if interaction.guild is not None and not get_general_settings(interaction.guild.id).games_enabled:
+            await interaction.response.send_message(
+                '❌ Games are disabled in this server.',
+                ephemeral = True
+            )
+            return
+
         user_choice = choice.value
         bot_choice = random.choice(RPS_CHOICES)
 
@@ -70,16 +80,7 @@ class GamesCog(commands.Cog):
             colour = 0x00F3FF
         )
 
-        await interaction.response.send_message(
-            embed = discord.Embed(
-                description = (
-                    f'You chose **{user_choice.title()}**\n'
-                    f'I chose **{bot_choice.title()}**\n\n'
-                    f'**{result}**'
-                ),
-                colour = 0x00F3FF
-            )
-        )
+        await interaction.response.send_message(embed = embed)
 
         if interaction.guild is not None:
             log_game(

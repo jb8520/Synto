@@ -8,6 +8,7 @@ def set_guild_premium_status(
     is_premium: bool,
     entitlement_id: int | None = None,
     sku_id: int | None = None,
+    purchaser_user_id: int | None = None,
     premium_ends_at: datetime | None = None
 ) -> None:
     ensure_guild_exists(guild_id)
@@ -18,13 +19,15 @@ def set_guild_premium_status(
             is_premium,
             entitlement_id,
             sku_id,
+            purchaser_user_id,
             premium_ends_at
         )
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE
             is_premium = VALUES(is_premium),
             entitlement_id = VALUES(entitlement_id),
             sku_id = VALUES(sku_id),
+            purchaser_user_id = VALUES(purchaser_user_id),
             premium_ends_at = VALUES(premium_ends_at)
     '''
 
@@ -33,6 +36,7 @@ def set_guild_premium_status(
         is_premium,
         entitlement_id,
         sku_id,
+        purchaser_user_id,
         premium_ends_at
     )
 
@@ -48,8 +52,27 @@ def clear_guild_premium_status(guild_id: int) -> None:
         is_premium = False,
         entitlement_id = None,
         sku_id = None,
+        purchaser_user_id = None,
         premium_ends_at = None
     )
+
+
+def user_has_active_premium_purchase(user_id: int) -> bool:
+    query = '''
+        SELECT COUNT(*) AS count
+        FROM guild_premium_status
+        WHERE purchaser_user_id = %s AND is_premium = TRUE
+    '''
+
+    row = fetch_one(
+        query = query,
+        values = (user_id,)
+    )
+
+    if row is None:
+        return False
+
+    return int(row['count']) > 0
 
 
 def guild_has_premium_cached(guild_id: int) -> bool:

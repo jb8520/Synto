@@ -47,6 +47,19 @@ class AutoVcMenuView(BaseSettingsView):
             'Moderator Roles',
             '> Roles that can bypass normal Auto VC ownership restrictions.',
         ),
+        (
+            'Name',
+            '> The display name for this Auto VC setup, used by the `{name}` placeholder in the naming pattern.',
+        ),
+        (
+            'Naming Pattern',
+            '> The template used to name created voice channels. Supports `{name}`, `{number}`, `{member_name}`, `{username}`, and `{server}`.',
+        ),
+        (
+            'Status',
+            '> Whether this Auto VC setup is active. Disabled setups will not create voice channels when their VC Creator channel is joined. '
+            'Non-default setups also require Synto Premium - `Locked (Premium required)` means the setup is enabled but this server no longer has Premium.',
+        ),
     ]
 
 

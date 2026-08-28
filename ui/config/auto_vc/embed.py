@@ -2,7 +2,9 @@ import discord
 
 from database.models import AutoVCSettings
 
-from .. import SETTINGS_COLOUR
+from services.auto_vc import describe_auto_vc_status
+
+from .. import get_settings_colour
 
 
 def build_auto_vc_embed(
@@ -61,13 +63,13 @@ def build_auto_vc_embed(
         )
 
     configured = '`Yes`' if settings.is_configured else '`No`'
-    enabled = '`Yes`' if settings.is_enabled else '`No`'
+    status = f'`{describe_auto_vc_status(guild.id, settings)}`'
     default = '`Yes`' if settings.is_default else '`No`'
 
     embed = discord.Embed(
         title = f'Auto VC Settings: {settings.name}',
         description = 'Configure this Auto VC setup.',
-        colour = SETTINGS_COLOUR
+        colour = get_settings_colour(guild.id)
     )
 
     embed.add_field(
@@ -107,8 +109,8 @@ def build_auto_vc_embed(
     )
 
     embed.add_field(
-        name = 'Enabled',
-        value = f'> {enabled}',
+        name = 'Status',
+        value = f'> {status}',
         inline = True
     )
 

@@ -37,6 +37,20 @@ class WelcomeTitleModal(discord.ui.Modal):
 
         await interaction.response.defer()
 
+        if title.lower() == 'none':
+            await interaction.followup.send(
+                embed = discord.Embed(
+                    description = (
+                        'The welcome message title can\'t be `none` - '
+                        'that text is reserved and would be sent with no '
+                        'title at all. Enter a real title instead.'
+                    ),
+                    colour = SETTINGS_COLOUR
+                ),
+                ephemeral = True
+            )
+            return
+
         set_welcome_title(
             guild_id = interaction.guild.id,
             title = title,
@@ -73,7 +87,7 @@ class WelcomeDescriptionModal(discord.ui.Modal):
 
         await interaction.response.defer()
 
-        if description == '':
+        if description == '' or description.lower() == 'none':
             clear_welcome_description(guild_id = interaction.guild.id)
 
             await interaction.followup.send(

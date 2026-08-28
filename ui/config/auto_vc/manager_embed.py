@@ -3,7 +3,9 @@ import discord
 from database.models.auto_vc import AutoVCSettings
 from database.repositories import get_auto_vc_settings_for_guild
 
-from .. import SETTINGS_COLOUR
+from services.auto_vc import describe_auto_vc_status
+
+from .. import get_settings_colour
 
 
 def build_auto_vc_manager_embed(
@@ -14,9 +16,9 @@ def build_auto_vc_manager_embed(
     )
 
     embed = discord.Embed(
-        title = 'Auto VC Setups',
+        title = '🔊 Auto VC Setups',
         description = 'Manage this server\'s Auto VC setups.',
-        colour = SETTINGS_COLOUR
+        colour = get_settings_colour(guild.id)
     )
 
     if not settings_list:
@@ -89,7 +91,7 @@ def format_auto_vc_manager_row(
             else '`Unknown channel`'
         )
 
-    status = '`Enabled`' if settings.is_enabled else '`Disabled`'
+    status = f'`{describe_auto_vc_status(guild.id, settings)}`'
     configured = '`Configured`' if settings.is_configured else '`Not configured`'
 
     return (

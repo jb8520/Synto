@@ -2,10 +2,7 @@ import discord
 
 from checks.permissions import admin_only_interaction
 
-from database.repositories import (
-    set_welcome_channel,
-    set_welcome_status
-)
+from database.repositories import set_welcome_channel
 
 from .. import SETTINGS_COLOUR
 
@@ -53,67 +50,3 @@ class WelcomeChannelSelect(discord.ui.ChannelSelect):
         )
 
         self.parent_view.stop()
-
-
-class WelcomeStatusView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout = None)
-
-
-    async def _set_status(
-        self,
-        interaction: discord.Interaction,
-        status: bool
-    ) -> None:
-        allowed, _ = await admin_only_interaction(interaction)
-
-        if not allowed:
-            return
-
-        await interaction.response.defer()
-
-        set_welcome_status(
-            guild_id = interaction.guild.id,
-            status = status
-        )
-
-        await interaction.edit_original_response(
-            embed = discord.Embed(
-                description = f'Welcome messages have been set to `{status}`.',
-                colour = SETTINGS_COLOUR
-            ),
-            view = None
-        )
-
-        self.stop()
-    
-
-    @discord.ui.button(
-        emoji = '✅',
-        label = 'True',
-        style = discord.ButtonStyle.grey
-    )
-    async def true(
-        self,
-        interaction: discord.Interaction,
-        _: discord.ui.Button
-    ):
-        await self._set_status(
-            interaction = interaction,
-            status = True
-        )  
-
-    @discord.ui.button(
-        emoji = '❌',
-        label = 'False',
-        style = discord.ButtonStyle.grey
-    )
-    async def false(
-        self,
-        interaction: discord.Interaction,
-        _: discord.ui.Button
-    ):
-        await self._set_status(
-            interaction = interaction,
-            status = False
-        )

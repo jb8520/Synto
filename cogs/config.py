@@ -26,7 +26,7 @@ class ConfigCog(commands.Cog):
         
         await interaction.response.send_message(
             content = None,
-            embed = build_main_menu_embed(),
+            embed = build_main_menu_embed(interaction.guild.id),
             view = ConfigMenuView(),
             ephemeral = False
         )

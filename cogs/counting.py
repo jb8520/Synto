@@ -15,7 +15,10 @@ class CountingCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name = 'counting_stats')
+    @app_commands.command(
+        name = 'counting-stats',
+        description = 'Shows this server\'s counting progress, such as the highscore and current count.'
+    )
     async def counting_stats(self, interaction: discord.Interaction):
         if interaction.guild is None:
             return
@@ -35,7 +38,10 @@ class CountingCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        await handle_counting_message(message)
+        await handle_counting_message(
+            runtime = self.bot.counting_save_runtime,
+            message = message
+        )
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):

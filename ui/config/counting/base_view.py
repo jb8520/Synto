@@ -2,18 +2,19 @@ import discord
 
 from checks.permissions import admin_only_interaction
 
-from database.repositories import get_counting_settings
+from database.repositories import (
+    get_counting_settings,
+    toggle_double_count,
+    toggle_counting_saves_enabled
+)
 
 from ..common import BaseSettingsView
 
-from .. import SETTINGS_COLOUR
+from .. import SETTINGS_COLOUR, get_settings_colour
 
 from .embed import build_counting_embed
 
-from .config_views import (
-    CountingChannelView,
-    CountingDoubleCountView
-)
+from .config_views import CountingChannelView
 
 
 class CountingMenuView(BaseSettingsView):
@@ -27,6 +28,11 @@ class CountingMenuView(BaseSettingsView):
         (
             'Double Count',
             '> Whether members can count multiple times in a row.',
+        ),
+        (
+            'Counting Saves',
+            '> Whether members can use their own Counting Saves to rescue a broken count. '
+            'Enabled by default - Counting Saves are owned by the member, not this server.',
         ),
     ]
 
@@ -93,28 +99,49 @@ class CountingMenuView(BaseSettingsView):
 
         if not allowed:
             return
-        
-        await interaction.response.defer(
-            ephemeral = True,
-            thinking = True
-        )
 
-        settings = get_counting_settings(interaction.guild.id)
-        
-        view = CountingDoubleCountView()
+        new_value = toggle_double_count(interaction.guild.id)
+
+        await interaction.response.edit_message(
+            embed = build_counting_embed(interaction),
+            view = CountingMenuView()
+        )
 
         await interaction.followup.send(
             embed = discord.Embed(
-                description = f'Double counting is currently set to {settings.double_count}',
-                colour = SETTINGS_COLOUR
+                description = f'Double counting has been set to `{new_value}`.',
+                colour = get_settings_colour(interaction.guild.id)
             ),
-            view = view,
             ephemeral = True
         )
 
-        await view.wait()
 
-        await interaction.message.edit(
+    @discord.ui.button(
+        label = 'Counting Saves',
+        style = discord.ButtonStyle.grey,
+        row = 0
+    )
+    async def counting_saves_enabled(
+        self,
+        interaction: discord.Interaction,
+        _: discord.ui.Button
+    ):
+        allowed, _ = await admin_only_interaction(interaction)
+
+        if not allowed:
+            return
+
+        new_value = toggle_counting_saves_enabled(interaction.guild.id)
+
+        await interaction.response.edit_message(
             embed = build_counting_embed(interaction),
             view = CountingMenuView()
+        )
+
+        await interaction.followup.send(
+            embed = discord.Embed(
+                description = f'Counting Saves have been set to `{new_value}`.',
+                colour = get_settings_colour(interaction.guild.id)
+            ),
+            ephemeral = True
         )

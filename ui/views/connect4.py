@@ -89,24 +89,24 @@ class Connect4Select(discord.ui.Select):
             #         ephemeral = True,
             #     )
             #     return
-            
+
             view.player_2 = interaction.user.id
             view.player_turn = 2
 
         if view.player_turn == 1 and view.player_1 == interaction.user.id:
             tile = PLAYER_1_TILE
-            view.player_turn = 2
+            upcoming_turn = 2
 
             if view.player_2 == 0:
                 next_player = 'Player 2'
-            
+
             else:
                 next_player = mention_user(interaction.guild, view.player_2)
 
         elif view.player_turn == 2 and view.player_2 == interaction.user.id:
             tile = PLAYER_2_TILE
-            view.player_turn = 1
-            
+            upcoming_turn = 1
+
             next_player = mention_user(interaction.guild, view.player_1)
 
         else:
@@ -133,6 +133,7 @@ class Connect4Select(discord.ui.Select):
             )
             return
 
+        view.player_turn = upcoming_turn
         view.board[row_index][column_index] = tile
 
         if row_index == 0:

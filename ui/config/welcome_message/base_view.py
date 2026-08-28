@@ -2,7 +2,10 @@ import discord
 
 from checks.permissions import admin_only_interaction
 
-from database.repositories import get_welcome_message_settings
+from database.repositories import (
+    get_welcome_message_settings,
+    reset_welcome_message_settings
+)
 
 from ..common import BaseSettingsView
 
@@ -13,10 +16,7 @@ from .embed import (
     build_welcome_preview_embed
 )
 
-from .config_views import (
-    WelcomeChannelView,
-    WelcomeStatusView
-)
+from .config_views import WelcomeChannelView
 
 from .config_modals import(
     WelcomeTitleModal,
@@ -46,12 +46,12 @@ class WelcomeMessageMenuView(BaseSettingsView):
             '> The embed colour for the welcome message. Use a hex colour such as `#00F3FF`.'
         ),
         (
-            'Status',
-            '> Whether welcome messages are currently enabled.'
-        ),
-        (
             'Preview',
             '> Sends an ephemeral preview of the currently configured welcome message.'
+        ),
+        (
+            'Reset',
+            '> Resets the welcome message channel, title, description, colour, and status back to their defaults.'
         )
     ]
 
@@ -108,50 +108,9 @@ class WelcomeMessageMenuView(BaseSettingsView):
 
 
     @discord.ui.button(
-        label = 'Status',
-        style = discord.ButtonStyle.grey,
-        row = 0
-    )
-    async def status(
-        self,
-        interaction: discord.Interaction,
-        _: discord.ui.Button
-    ):
-        allowed, _ = await admin_only_interaction(interaction)
-
-        if not allowed:
-            return
-
-        await interaction.response.defer(
-            ephemeral = True,
-            thinking = True
-        )
-
-        settings = get_welcome_message_settings(interaction.guild.id)
-        
-        view = WelcomeStatusView()
-
-        await interaction.followup.send(
-            embed = discord.Embed(
-                description = f'Welcome messages are currently set to `{settings.status}`.',
-                colour = SETTINGS_COLOUR
-            ),
-            view = view,
-            ephemeral = True
-        )
-
-        await view.wait()
-
-        await interaction.message.edit(
-            embed = build_welcome_message_embed(interaction),
-            view = WelcomeMessageMenuView()
-        )
-
-
-    @discord.ui.button(
         label = 'Title',
         style = discord.ButtonStyle.grey,
-        row = 1
+        row = 0
     )
     async def title(
         self,
@@ -230,7 +189,7 @@ class WelcomeMessageMenuView(BaseSettingsView):
 
     @discord.ui.button(
         label = 'Preview',
-        style = discord.ButtonStyle.grey,
+        style = discord.ButtonStyle.blurple,
         row = 2
     )
     async def preview(
@@ -262,4 +221,34 @@ class WelcomeMessageMenuView(BaseSettingsView):
             content = f'Preview welcome message for {interaction.user.mention}:',
             embed = preview_embed,
             ephemeral = True,
+        )
+
+    @discord.ui.button(
+        label = 'Reset',
+        style = discord.ButtonStyle.red,
+        row = 2
+    )
+    async def reset(
+        self,
+        interaction: discord.Interaction,
+        _: discord.ui.Button
+    ):
+        allowed, _ = await admin_only_interaction(interaction)
+
+        if not allowed:
+            return
+
+        reset_welcome_message_settings(interaction.guild.id)
+
+        await interaction.response.edit_message(
+            embed = build_welcome_message_embed(interaction),
+            view = WelcomeMessageMenuView()
+        )
+
+        await interaction.followup.send(
+            embed = discord.Embed(
+                description = 'Welcome message settings have been reset to their defaults.',
+                colour = SETTINGS_COLOUR
+            ),
+            ephemeral = True
         )

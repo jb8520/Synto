@@ -7,6 +7,8 @@ from discord import (
 
 from database.repositories import get_welcome_message_settings
 
+from services.welcome_message import format_welcome_text
+
 from .. import SETTINGS_COLOUR
 
 
@@ -38,11 +40,17 @@ def build_welcome_message_embed(interaction: Interaction) -> Embed:
             else '`Unknown channel`'
         )
 
-    title = settings.title.strip() or '`Not set`'
+    stripped_title = settings.title.strip()
+    title = (
+        f'`{stripped_title}`'
+        if stripped_title and stripped_title.lower() != 'none'
+        else '`Not set`'
+    )
 
+    stripped_description = (settings.description or '').strip()
     description = (
-        settings.description
-        if settings.description is not None and settings.description.strip() != ''
+        stripped_description
+        if stripped_description and stripped_description.lower() != 'none'
         else '`Not set`'
     )
 
@@ -52,10 +60,10 @@ def build_welcome_message_embed(interaction: Interaction) -> Embed:
         else '`Not set`'
     )
 
-    status = '`Enabled`' if settings.status else '`Disabled`'
+    configured = '`Yes`' if settings.is_configured else '`No`'
 
     embed = Embed(
-        title = 'Welcome Message Settings',
+        title = '👋 Welcome Message Settings',
         description = 'Configure the welcome message sent when members join the server.',
         colour = _get_embed_colour(settings.colour)
     )
@@ -85,8 +93,8 @@ def build_welcome_message_embed(interaction: Interaction) -> Embed:
     )
 
     embed.add_field(
-        name = 'Status',
-        value = f'> {status}',
+        name = 'Configured',
+        value = f'> {configured}',
         inline = False
     )
 
@@ -99,21 +107,13 @@ def build_welcome_preview_embed(
     description: str | None,
     colour: str | None
 ) -> Embed:
-    title = title.strip() or 'Welcome!'
+    # Reuse the exact formatting used when actually sending a welcome message,
+    # so the preview always matches what a real member join will produce
+    # (e.g. a title/description of "none" is omitted in both places).
+    title = format_welcome_text(text = title, member = member)
+    description = format_welcome_text(text = description, member = member)
 
-    title = title.replace('{member}', f'{member.mention}')
-    title = title.replace('{member_name}', f'{member.display_name}')
-    title = title.replace('{server}', f'{interaction.guild.name}')
-
-    if description:
-        description = description.replace('{member}', f'{member.mention}')
-        description = description.replace('{member_name}', f'{member.display_name}')
-        description = description.replace('{server}', f'{interaction.guild.name}')
-
-        if description.strip() == '':
-            description = None
-
-    colour =_get_embed_colour(colour)
+    colour = _get_embed_colour(colour)
 
     embed = Embed(
         title = title,

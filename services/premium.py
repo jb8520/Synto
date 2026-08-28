@@ -4,34 +4,25 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from checks.premium import guild_has_premium
 from database.repositories import (
     log_command,
     clear_guild_premium_status,
     get_cached_premium_guild_ids,
+    guild_has_premium_cached,
     set_guild_premium_status,
-    set_many_guilds_not_premium
+    set_many_guilds_not_premium,
+    get_user_save_balance
 )
 from settings import settings
+from ui.config import get_settings_colour
 from ui.views.premium import (
     PremiumUpsellView,
     CountingSavesUpsellView
 )
 
 
-PREMIUM_COLOUR = 0x00F3FF
-
-
 def _is_premium_sku(sku_id: int) -> bool:
     return sku_id == settings.synto_premium_sku_id
-
-
-def _is_counting_save_sku(sku_id: int) -> bool:
-    return sku_id in {
-        settings.counting_save_1_sku_id,
-        settings.counting_save_3_sku_id,
-        settings.counting_save_10_sku_id
-    }
 
 
 def _get_entitlement_guild_id(entitlement: discord.Entitlement) -> int | None:
@@ -92,30 +83,41 @@ def build_premium_embed(
     embed = discord.Embed(
         title = 'Synto Premium',
         description = description,
-        colour = PREMIUM_COLOUR
+        colour = get_settings_colour(interaction.guild.id)
     )
 
-    if interaction.guild is not None:
-        embed.set_footer(
-            text = f'Server: {interaction.guild.name}'
-        )
+    embed.set_footer(
+        text = f'Server: {interaction.guild.name}'
+    )
 
     return embed
 
 
-def build_counting_saves_embed() -> discord.Embed:
-    return discord.Embed(
+def build_counting_saves_embed(guild_id: int, balance: int) -> discord.Embed:
+    embed = discord.Embed(
         title = 'Counting Saves',
         description = (
-            'Counting Saves let a server recover when someone ruins the count.\n\n'
+            'A Counting Save lets you rescue your own mistake before it ruins the count - '
+            'if you post the wrong number or double count, you get 60 seconds to use one '
+            'and keep the count going.\n\n'
+            'Counting Saves belong to you, not a server - buy them once and use them in '
+            'any server that has them enabled.\n\n'
             '**Available packs:**\n'
             '> `1` save\n'
             '> `3` saves\n'
             '> `10` saves\n\n'
             'Use the buttons below to buy saves.'
         ),
-        colour = PREMIUM_COLOUR,
+        colour = get_settings_colour(guild_id),
     )
+
+    embed.add_field(
+        name = 'Your Balance',
+        value = f'> `{balance}` Counting Save{"s" if balance != 1 else ""}',
+        inline = False
+    )
+
+    return embed
 
 
 async def premium_upsell(interaction: discord.Interaction) -> None:
@@ -126,14 +128,16 @@ async def premium_upsell(interaction: discord.Interaction) -> None:
         )
         return
 
-    has_premium = guild_has_premium(interaction)
+    has_premium = guild_has_premium_cached(interaction.guild.id)
 
     embed = build_premium_embed(
         interaction = interaction,
         has_premium = has_premium
     )
 
-    view = None if has_premium else PremiumUpsellView()
+    # send_message's `view` defaults to the MISSING sentinel, not None -
+    # passing None explicitly makes discord.py call None.is_finished() and crash.
+    view = discord.utils.MISSING if has_premium else PremiumUpsellView()
 
     await interaction.response.send_message(
         embed = embed,
@@ -155,7 +159,7 @@ async def premium_status(interaction: discord.Interaction) -> None:
         )
         return
 
-    has_premium = guild_has_premium(interaction)
+    has_premium = guild_has_premium_cached(interaction.guild.id)
 
     premium_entitlements = [
         entitlement
@@ -171,7 +175,7 @@ async def premium_status(interaction: discord.Interaction) -> None:
 
     embed = discord.Embed(
         title = 'Premium Status',
-        colour = PREMIUM_COLOUR
+        colour = get_settings_colour(interaction.guild.id)
     )
 
     embed.add_field(
@@ -205,8 +209,10 @@ async def counting_saves_upsell(interaction: discord.Interaction) -> None:
         )
         return
 
+    balance = get_user_save_balance(interaction.user.id)
+
     await interaction.response.send_message(
-        embed = build_counting_saves_embed(),
+        embed = build_counting_saves_embed(guild_id = interaction.guild.id, balance = balance),
         view = CountingSavesUpsellView()
     )
 
@@ -218,15 +224,18 @@ async def counting_saves_upsell(interaction: discord.Interaction) -> None:
 
 
 async def handle_premium_entitlement_update(
-    entitlement: discord.Entitlement
+    entitlement: discord.Entitlement,
+    bot: commands.Bot | None = None
 ) -> None:
     if int(entitlement.sku_id) != settings.synto_premium_sku_id:
         return
-    print('                                                                                       test                                                                                       ')
+
     guild_id = _get_entitlement_guild_id(entitlement)
 
     if guild_id is None:
         return
+
+    purchaser_user_id = _get_entitlement_user_id(entitlement)
 
     if _entitlement_is_active(entitlement):
         set_guild_premium_status(
@@ -234,10 +243,20 @@ async def handle_premium_entitlement_update(
             is_premium = True,
             entitlement_id = int(entitlement.id),
             sku_id = int(entitlement.sku_id),
+            purchaser_user_id = purchaser_user_id,
             premium_ends_at = getattr(entitlement, 'ends_at', None)
         )
 
         print(f'✅ Premium active for guild_id={guild_id}')
+
+        if bot is not None and purchaser_user_id is not None:
+            from services.supporter_role import grant_supporter_role_if_missing
+
+            await grant_supporter_role_if_missing(
+                bot = bot,
+                user_id = purchaser_user_id
+            )
+
         return
 
     clear_guild_premium_status(
@@ -247,9 +266,33 @@ async def handle_premium_entitlement_update(
     print(f'🔒 Premium inactive for guild_id={guild_id}')
 
 
+async def handle_premium_entitlement_delete(
+    entitlement: discord.Entitlement
+) -> None:
+    if int(entitlement.sku_id) != settings.synto_premium_sku_id:
+        return
+
+    guild_id = _get_entitlement_guild_id(entitlement)
+
+    if guild_id is None:
+        return
+
+    # An ENTITLEMENT_DELETE means the entitlement itself was removed
+    # (refund/revocation) - this is distinct from a subscription simply
+    # lapsing, which Discord instead reflects via ends_at on an update.
+    # Access must be revoked immediately regardless of ends_at/deleted.
+    clear_guild_premium_status(
+        guild_id = guild_id
+    )
+
+    print(f'🔒 Premium revoked for guild_id={guild_id} (entitlement deleted)')
+
+
 
 async def sync_premium_entitlements(bot: commands.Bot) -> None:
     print('🔄 Syncing premium entitlements...')
+
+    from services.supporter_role import grant_supporter_role_if_missing
 
     active_premium_guild_ids: set[int] = set()
 
@@ -268,14 +311,22 @@ async def sync_premium_entitlements(bot: commands.Bot) -> None:
                 continue
 
             active_premium_guild_ids.add(guild_id)
+            purchaser_user_id = _get_entitlement_user_id(entitlement)
 
             set_guild_premium_status(
                 guild_id = guild_id,
                 is_premium = True,
                 entitlement_id = int(entitlement.id),
                 sku_id = int(entitlement.sku_id),
+                purchaser_user_id = purchaser_user_id,
                 premium_ends_at = getattr(entitlement, 'ends_at', None)
             )
+
+            if purchaser_user_id is not None:
+                await grant_supporter_role_if_missing(
+                    bot = bot,
+                    user_id = purchaser_user_id
+                )
 
     except Exception as error:
         print(

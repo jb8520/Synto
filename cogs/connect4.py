@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.repositories import log_game
+from database.repositories import log_game, get_general_settings
 
 from ui.views.connect4 import Connect4View
 
@@ -12,8 +12,18 @@ class Connect4Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name = 'connect4')
+    @app_commands.command(
+        name = 'connect4',
+        description = 'Starts a 2 player game of Connect 4.'
+    )
     async def connect4(self, interaction: discord.Interaction):
+        if interaction.guild is not None and not get_general_settings(interaction.guild.id).games_enabled:
+            await interaction.response.send_message(
+                '❌ Games are disabled in this server.',
+                ephemeral = True
+            )
+            return
+
         view = Connect4View()
 
         await interaction.response.send_message(

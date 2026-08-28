@@ -628,8 +628,8 @@ def delete_auto_vc_settings(auto_vc_id: int) -> tuple[bool, str]:
     if settings is None:
         return False, 'That Auto VC setup does not exist.'
 
-    if settings.is_default:
-        return False, 'The default Auto VC setup cannot be deleted.'
+    if settings.is_default and count_auto_vc_settings(settings.guild_id) > 1:
+        return False, 'The default Auto VC setup cannot be deleted while other setups exist.'
 
     query = '''
         DELETE FROM auto_vc_settings

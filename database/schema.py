@@ -1,6 +1,23 @@
 from database.connection_pool import _get_connection
 
 
+def _column_exists(cursor, table_name: str, column_name: str) -> bool:
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_NAME = %s
+            AND COLUMN_NAME = %s
+        """,
+        (table_name, column_name)
+    )
+
+    (count,) = cursor.fetchone()
+
+    return count > 0
+
+
 def create_tables() -> None:
     with _get_connection() as connection:
         cursor = connection.cursor()
@@ -24,6 +41,7 @@ def create_tables() -> None:
 
                     entitlement_id BIGINT UNSIGNED NULL,
                     sku_id BIGINT UNSIGNED NULL,
+                    purchaser_user_id BIGINT UNSIGNED NULL,
                     premium_ends_at TIMESTAMP NULL,
 
                     last_checked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -35,6 +53,14 @@ def create_tables() -> None:
                 )
                 """
             )
+
+            if not _column_exists(cursor, 'guild_premium_status', 'purchaser_user_id'):
+                cursor.execute(
+                    """
+                    ALTER TABLE guild_premium_status
+                    ADD COLUMN purchaser_user_id BIGINT UNSIGNED NULL
+                    """
+                )
 
             cursor.execute(
                 """
@@ -50,6 +76,39 @@ def create_tables() -> None:
                     FOREIGN KEY (guild_id)
                         REFERENCES guilds(guild_id)
                         ON DELETE CASCADE
+                )
+                """
+            )
+
+            if not _column_exists(cursor, 'counting_settings', 'counting_saves_enabled'):
+                cursor.execute(
+                    """
+                    ALTER TABLE counting_settings
+                    ADD COLUMN counting_saves_enabled BOOLEAN NOT NULL DEFAULT TRUE
+                    """
+                )
+
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS user_counting_saves (
+                    user_id BIGINT UNSIGNED PRIMARY KEY,
+                    balance INT UNSIGNED NOT NULL DEFAULT 0
+                )
+                """
+            )
+
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS counting_save_purchases (
+                    entitlement_id BIGINT UNSIGNED PRIMARY KEY,
+
+                    user_id BIGINT UNSIGNED NOT NULL,
+                    sku_id BIGINT UNSIGNED NOT NULL,
+                    saves_granted INT UNSIGNED NOT NULL,
+
+                    credited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                    INDEX idx_counting_save_purchases_user (user_id)
                 )
                 """
             )
@@ -120,6 +179,41 @@ def create_tables() -> None:
                     description TEXT NULL,
                     colour CHAR(6) NULL,
                     status BOOLEAN NOT NULL DEFAULT FALSE,
+
+                    FOREIGN KEY (guild_id)
+                        REFERENCES guilds(guild_id)
+                        ON DELETE CASCADE
+                )
+                """
+            )
+
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS general_settings (
+                    guild_id BIGINT UNSIGNED PRIMARY KEY,
+
+                    auto_vc_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                    counting_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                    games_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+
+                    embed_colour CHAR(6) NULL,
+
+                    updates_channel_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+
+                    FOREIGN KEY (guild_id)
+                        REFERENCES guilds(guild_id)
+                        ON DELETE CASCADE
+                )
+                """
+            )
+
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS general_admin_roles (
+                    guild_id BIGINT UNSIGNED NOT NULL,
+                    role_id BIGINT UNSIGNED NOT NULL,
+
+                    PRIMARY KEY (guild_id, role_id),
 
                     FOREIGN KEY (guild_id)
                         REFERENCES guilds(guild_id)

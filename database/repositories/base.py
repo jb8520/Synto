@@ -52,6 +52,23 @@ def execute(
 
         return cursor.lastrowid
 
+def execute_get_rowcount(
+    query: str,
+    values: Iterable[Any] = ()
+) -> int:
+    with _get_connection() as connection:
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(query, tuple(values))
+
+            connection.commit()
+
+            return cursor.rowcount
+
+        finally:
+            cursor.close()
+
 def execute_many(
     query: str,
     values: Iterable[Iterable[Any]]

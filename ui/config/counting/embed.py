@@ -5,7 +5,7 @@ from discord import (
 
 from database.repositories import get_counting_settings
 
-from .. import SETTINGS_COLOUR
+from .. import get_settings_colour
 
 
 def build_counting_embed(interaction: Interaction) -> Embed:
@@ -18,8 +18,8 @@ def build_counting_embed(interaction: Interaction) -> Embed:
         channel = discord_channel.mention if discord_channel is not None else '#channel'
 
     embed = Embed(
-        title = 'Counting Settings ⚙️',
-        colour = SETTINGS_COLOUR
+        title = '🔢 Counting Settings',
+        colour = get_settings_colour(interaction.guild.id)
     )
 
     embed.add_field(
@@ -31,6 +31,12 @@ def build_counting_embed(interaction: Interaction) -> Embed:
     embed.add_field(
         name = 'Double Count',
         value = f'> {settings.double_count}',
+        inline = False
+    )
+
+    embed.add_field(
+        name = 'Counting Saves',
+        value = f'> {settings.counting_saves_enabled}',
         inline = False
     )
 

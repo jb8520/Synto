@@ -20,7 +20,10 @@ class Settings:
 
     bot_id: int
     bot_owner_id: int
-    
+
+    support_server_id: int | None
+    supporter_role_id: int | None
+
 
     database_host: str
     database_name: str
@@ -63,7 +66,19 @@ def _build_settings() -> Settings:
 
         bot_id = int(os.environ['DEV_BOT_ID'] if args.dev else os.environ['BOT_ID']),
         bot_owner_id = int(os.environ['BOT_OWNER_ID']),
-        
+
+    
+        support_server_id = (
+            int(os.environ['SUPPORT_SERVER_ID'])
+            if os.environ.get('SUPPORT_SERVER_ID')
+            else None
+        ),
+        supporter_role_id = (
+            int(os.environ['SUPPORTER_ROLE_ID'])
+            if os.environ.get('SUPPORTER_ROLE_ID')
+            else None
+        ),
+
 
         database_host = str(os.environ['DEV_DATABASE_HOST'] if use_dev_db else os.environ['DATABASE_HOST']),
         database_name = str(os.environ['DEV_DATABASE_NAME'] if use_dev_db else os.environ['DATABASE_NAME']),

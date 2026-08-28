@@ -3,7 +3,8 @@ from .premium import (
     guild_has_premium_cached,
     clear_guild_premium_status,
     get_cached_premium_guild_ids,
-    set_many_guilds_not_premium
+    set_many_guilds_not_premium,
+    user_has_active_premium_purchase
 )
 
 from .auto_vc import (
@@ -39,12 +40,23 @@ from .counting import (
     get_counting_settings,
     set_counting_channel,
     set_double_count,
+    toggle_double_count,
+    set_counting_saves_enabled,
+    toggle_counting_saves_enabled,
     update_current_score,
+    advance_count_if_unchanged,
     reset_current_score,
     update_highscore,
     update_highscore_if_needed,
     reset_counting_progress,
     delete_counting_settings
+)
+
+from .counting_saves import (
+    get_user_save_balance,
+    credit_user_saves,
+    consume_user_save_if_available,
+    record_entitlement_credit
 )
 
 from .metrics import (
@@ -67,9 +79,26 @@ from .welcome_message import (
     set_welcome_description,
     set_welcome_colour,
     set_welcome_status,
+    toggle_welcome_status,
     update_welcome_message_settings,
     clear_welcome_description,
     clear_welcome_colour,
     reset_welcome_message_settings,
     delete_welcome_message_settings
+)
+
+from .general import (
+    ensure_general_settings_exist,
+    get_general_settings,
+    get_general_admin_role_ids,
+    set_general_admin_roles,
+    set_auto_vc_module_enabled,
+    toggle_auto_vc_module_enabled,
+    set_counting_module_enabled,
+    toggle_counting_module_enabled,
+    set_games_module_enabled,
+    toggle_games_module_enabled,
+    set_general_embed_colour,
+    set_updates_channel,
+    get_guilds_with_updates_channel
 )

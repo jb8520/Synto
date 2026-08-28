@@ -387,45 +387,57 @@ def migrate_metrics(cursor) -> None:
 
     rows = cursor.fetchall()
 
+    values = []
+
     for id_, user_id, guild_id, timestamp, action_type, command_name, auto_vc_type, details in rows:
         guild_id = to_int(guild_id)
 
         if guild_id == 0:
             continue
 
-        cursor.execute(
-            '''
-            INSERT INTO metrics (
-                id,
-                user_id,
-                guild_id,
-                timestamp,
-                action_type,
-                command_name,
-                auto_vc_type,
-                details
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                user_id = VALUES(user_id),
-                guild_id = VALUES(guild_id),
-                timestamp = VALUES(timestamp),
-                action_type = VALUES(action_type),
-                command_name = VALUES(command_name),
-                auto_vc_type = VALUES(auto_vc_type),
-                details = VALUES(details)
-            ''',
-            (
-                to_int(id_),
-                to_int(user_id),
-                guild_id,
-                timestamp,
-                str(action_type),
-                none_if_fake_none(command_name),
-                none_if_fake_none(auto_vc_type),
-                details,
-            ),
+        values.append((
+            to_int(id_),
+            to_int(user_id),
+            guild_id,
+            timestamp,
+            str(action_type),
+            none_if_fake_none(command_name),
+            none_if_fake_none(auto_vc_type),
+            details,
+        ))
+
+    if not values:
+        return
+
+    query = '''
+        INSERT INTO metrics (
+            id,
+            user_id,
+            guild_id,
+            timestamp,
+            action_type,
+            command_name,
+            auto_vc_type,
+            details
         )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            user_id = VALUES(user_id),
+            guild_id = VALUES(guild_id),
+            timestamp = VALUES(timestamp),
+            action_type = VALUES(action_type),
+            command_name = VALUES(command_name),
+            auto_vc_type = VALUES(auto_vc_type),
+            details = VALUES(details)
+    '''
+
+    # executemany() combines these into large multi-row INSERT statements
+    # instead of one round-trip per row - chunked to stay well under
+    # max_allowed_packet on a shared/managed MySQL host.
+    batch_size = 2000
+
+    for start in range(0, len(values), batch_size):
+        cursor.executemany(query, values[start:start + batch_size])
 
 
 def main():

@@ -96,7 +96,6 @@ class TicTacToeButton(discord.ui.Button['TicTacToeView']):
 
         if winner is None:
             content = f'It is now {next_player}\'s turn.'
-            message = f'{view.display_board()}\n{content}'
 
             await interaction.response.edit_message(
                 content = content,

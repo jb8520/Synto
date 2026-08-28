@@ -2,33 +2,39 @@ import discord
 
 from checks.permissions import admin_only_interaction
 
-from . import SETTINGS_COLOUR
+from . import get_settings_colour
 
 
-def build_main_menu_embed() -> discord.Embed:
+def build_main_menu_embed(guild_id: int) -> discord.Embed:
     embed = discord.Embed(
         title='Synto Settings ⚙️',
         description=(
             'Use the dropdown below to configure Synto for this server.\n\n'
             'Each section contains its own settings and information button.'
         ),
-        colour=SETTINGS_COLOUR,
+        colour=get_settings_colour(guild_id),
     )
 
     embed.add_field(
-        name='Counting',
+        name='🛠️ General',
+        value='> Configure admin roles, feature toggles, the updates channel, and embed colour.',
+        inline=False,
+    )
+
+    embed.add_field(
+        name='🔢 Counting',
         value='> Configure the counting channel and double-counting rules.',
         inline=False,
     )
 
     embed.add_field(
-        name='Auto VCs',
+        name='🔊 Auto VCs',
         value='> Configure automatic voice channel creation and permissions.',
         inline=False,
     )
 
     embed.add_field(
-        name='Welcome Message',
+        name='👋 Welcome Message',
         value='> Configure the server welcome message.',
         inline=False,
     )
@@ -99,7 +105,7 @@ class ConfigSelectMenu(discord.ui.Select):
         if selected_option == 'menu':
             await interaction.message.edit(
                 content = None,
-                embed = build_main_menu_embed(),
+                embed = build_main_menu_embed(interaction.guild.id),
                 view = ConfigMenuView(),
             )
             return

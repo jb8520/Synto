@@ -5,6 +5,7 @@ from checks.permissions import admin_only_interaction
 from database.models.auto_vc import AutoVCSettings
 from database.repositories import (
     guild_has_premium_cached,
+    count_auto_vc_settings,
     create_auto_vc_settings,
     delete_auto_vc_settings,
     get_auto_vc_settings,
@@ -38,7 +39,7 @@ class AutoVcManagerView(BaseSettingsView):
         ),
         (
             'Delete Auto VC',
-            '> Deletes a non-default Auto VC setup. The default setup cannot be deleted.',
+            '> Deletes an Auto VC setup. The default setup can only be deleted if it\'s the only setup remaining.',
         ),
         (
             'Change Default',
@@ -100,9 +101,12 @@ class AutoVcManagerView(BaseSettingsView):
             )
             return
 
+        is_first_setup = count_auto_vc_settings(interaction.guild.id) == 0
+
         auto_vc_id = create_auto_vc_settings(
             guild_id = interaction.guild.id,
-            name = 'VC'
+            name = 'VC',
+            is_default = is_first_setup
         )
 
         settings = get_auto_vc_settings(
@@ -126,7 +130,15 @@ class AutoVcManagerView(BaseSettingsView):
                 include_settings_menu = False,
                 include_utility_buttons = True,
                 manager_message = interaction.message
-            ) 
+            )
+        )
+
+        if interaction.message is None:
+            return
+
+        await refresh_auto_vc_manager_message(
+            guild = interaction.guild,
+            message = interaction.message
         )
 
     @discord.ui.button(
@@ -151,15 +163,24 @@ class AutoVcManagerView(BaseSettingsView):
             )
             return
 
-        settings_list = [
-            settings
-            for settings in get_auto_vc_settings_for_guild(interaction.guild.id)
-            if not settings.is_default
-        ]
+        all_settings = get_auto_vc_settings_for_guild(interaction.guild.id)
+
+        # The default can only be deleted when it's the sole remaining
+        # setup - otherwise deleting it would leave the guild with other
+        # setups but no default.
+        if len(all_settings) == 1:
+            settings_list = all_settings
+
+        else:
+            settings_list = [
+                settings
+                for settings in all_settings
+                if not settings.is_default
+            ]
 
         if not settings_list:
             await interaction.response.send_message(
-                '❌ There are no non-default Auto VC setups to delete.',
+                '❌ There are no Auto VC setups to delete.',
                 ephemeral = True
             )
             return
