@@ -1,4 +1,5 @@
 import datetime
+import subprocess
 from pathlib import Path
 
 import discord
@@ -21,13 +22,53 @@ IGNORED_LINE_COUNT_DIRS = {
 }
 
 
-def count_python_lines(root: Path = Path('.')) -> int:
+def _tracked_python_files(root: Path) -> list[Path] | None:
+    """
+    Files git actually tracks - immune to untracked cruft regardless of
+    what it's named (pip --user installs, caches, unrelated data folders
+    that happen to share the hosting volume, etc.), unlike a hand-maintained
+    directory blocklist. Returns None if git isn't available here.
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'ls-files', '*.py'],
+            cwd = root,
+            capture_output = True,
+            text = True,
+            check = True
+        )
+
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+    return [
+        root / line
+        for line in result.stdout.splitlines()
+        if line
+    ]
+
+
+def count_python_lines(root: Path | None = None) -> int:
+    # Anchor to the actual repo root (this file's grandparent directory)
+    # rather than the process's current working directory - the bot's CWD
+    # isn't guaranteed to be the repo root depending on how it's launched,
+    # and getting this wrong means silently counting unrelated files.
+    if root is None:
+        root = Path(__file__).resolve().parent.parent
+
+    file_paths = _tracked_python_files(root)
+
+    if file_paths is None:
+        # Fallback if git isn't available in this environment.
+        file_paths = [
+            file_path
+            for file_path in root.rglob('*.py')
+            if not any(part in IGNORED_LINE_COUNT_DIRS for part in file_path.parts)
+        ]
+
     total_lines = 0
 
-    for file_path in root.rglob('*.py'):
-        if any(part in IGNORED_LINE_COUNT_DIRS for part in file_path.parts):
-            continue
-
+    for file_path in file_paths:
         try:
             with file_path.open('r', encoding = 'utf-8') as file:
                 total_lines += sum(1 for _ in file)
